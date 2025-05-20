@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
@@ -11,10 +11,13 @@ from django.utils.encoding import force_bytes, force_str
 from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.contrib import messages
 from django.contrib.auth.views import LoginView, PasswordResetView, PasswordResetConfirmView
+from django.db.models import Avg
 
 from Dongelek import settings
 from .forms import SignUpForm, CustomAuthenticationForm, ProfileUpdateForm
 from .tokens import account_activation_token
+from cars.models import SellerReview
+from cars.forms import SellerReviewForm
 
 User = get_user_model()
 
@@ -105,3 +108,29 @@ def profile_view(request):
         form = ProfileUpdateForm(instance=request.user)
 
     return render(request, 'accounts/profile.html', {'form': form})
+
+
+def profile_detail(request, username):
+    profile_user = get_object_or_404(User, username=username)
+    
+    # Get seller reviews
+    seller_reviews = SellerReview.objects.filter(seller=profile_user).order_by('-created_at')
+    avg_seller_rating = seller_reviews.aggregate(Avg('rating'))['rating__avg']
+    seller_review_count = seller_reviews.count()
+    
+    # Check if logged-in user has already reviewed this seller
+    user_review = None
+    if request.user.is_authenticated and request.user != profile_user:
+        user_review = SellerReview.objects.filter(reviewer=request.user, seller=profile_user).first()
+    
+    context = {
+        'profile_user': profile_user,
+        'seller_reviews': seller_reviews,
+        'avg_seller_rating': avg_seller_rating,
+        'seller_review_count': seller_review_count,
+        'user_review': user_review,
+        'seller_review_form': SellerReviewForm(),
+        # ... other context items you already have ...
+    }
+    
+    return render(request, 'accounts/profile_detail.html', context)

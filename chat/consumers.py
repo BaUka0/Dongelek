@@ -184,20 +184,29 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         self.notification_group_name = f'notifications_{self.user.id}'
 
         # Join notification group
-        await self.channel_layer.group_add(
-            self.notification_group_name,
-            self.channel_name
-        )
-
-        await self.accept()
-
-    async def disconnect(self, close_code):
-        if hasattr(self, 'notification_group_name'):
-            # Leave notification group
-            await self.channel_layer.group_discard(
+        try:
+            await self.channel_layer.group_add(
                 self.notification_group_name,
                 self.channel_name
             )
+            await self.accept()
+            print(f"Successfully connected to notification group: {self.notification_group_name}")
+        except Exception as e:
+            print(f"Error connecting to notification group: {e}")
+            # Still accept the connection even if Redis fails
+            await self.accept()
+
+    async def disconnect(self, close_code):
+        if hasattr(self, 'notification_group_name'):
+            try:
+                # Leave notification group
+                await self.channel_layer.group_discard(
+                    self.notification_group_name,
+                    self.channel_name
+                )
+                print(f"Successfully disconnected from notification group: {self.notification_group_name}")
+            except Exception as e:
+                print(f"Error disconnecting from notification group: {e}")
 
     # Receive notification from group
     async def notification_message(self, event):

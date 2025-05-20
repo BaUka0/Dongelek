@@ -7,7 +7,7 @@
 {% block extra_css %}
 <style>
     .hero-section {
-        background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('{% static "images/hero-bg.jpg" %}');
+        background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('{% static "images/hero-bg.jpg" %}');
         background-size: cover;
         background-position: center;
         color: white;
@@ -22,6 +22,11 @@
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     }
     
+    [data-bs-theme="dark"] .search-box {
+        background-color: rgba(52, 58, 64, 0.9);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+    
     .feature-card {
         padding: 20px;
         text-align: center;
@@ -32,6 +37,10 @@
     .feature-card:hover {
         transform: translateY(-5px);
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    [data-bs-theme="dark"] .feature-card:hover {
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
     }
     
     .feature-icon {

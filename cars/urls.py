@@ -22,4 +22,8 @@ urlpatterns = [
     path('ajax/load-cities/', views.load_cities, name='ajax_load_cities'),
     path('ajax/create-brand/', views.create_brand, name='ajax_create_brand'),
     path('ajax/create-model/', views.create_model, name='ajax_create_model'),
+
+    # Seller Reviews
+    path('seller/<int:seller_id>/review/', views.add_seller_review, name='add_seller_review'),
+    path('seller/review/<int:review_id>/delete/', views.delete_seller_review, name='delete_seller_review'),
 ]

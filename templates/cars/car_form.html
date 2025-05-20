@@ -11,22 +11,38 @@
         box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         padding: 25px;
         margin-bottom: 20px;
+        transition: background-color 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s;
     }
+    
+    [data-bs-theme="dark"] .form-section {
+        background-color: #343a40;
+        color: #f8f9fa;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+    
     .form-section-title {
         margin-bottom: 20px;
         padding-bottom: 10px;
         border-bottom: 1px solid #e9ecef;
+        transition: border-color 0.3s;
     }
+    
+    [data-bs-theme="dark"] .form-section-title {
+        border-bottom: 1px solid #495057;
+    }
+    
     .required label:after {
         content: " *";
         color: red;
     }
+    
     .photo-upload-container {
         display: flex;
         flex-wrap: wrap;
         gap: 15px;
         margin-bottom: 20px;
     }
+    
     .photo-upload-box {
         width: 150px;
         height: 150px;
@@ -40,13 +56,22 @@
         position: relative;
         overflow: hidden;
         background-color: #f8f9fa;
+        transition: border-color 0.3s, background-color 0.3s;
     }
+    
+    [data-bs-theme="dark"] .photo-upload-box {
+        border-color: #495057;
+        background-color: #2c3136;
+    }
+    
     .photo-upload-box.with-image {
         border: none;
     }
+    
     .photo-upload-box.main-photo {
         border: 2px solid #28a745;
     }
+    
     .main-photo-badge {
         position: absolute;
         top: 5px;
@@ -58,10 +83,12 @@
         font-size: 0.7rem;
         z-index: 3;
     }
+    
     .photo-upload-box.marked-for-deletion {
         opacity: 0.5;
         border: 2px dashed #dc3545;
     }
+    
     .delete-badge {
         position: absolute;
         top: 5px;
@@ -73,6 +100,7 @@
         font-size: 0.7rem;
         z-index: 3;
     }
+    
     .photo-upload-box input[type="file"] {
         position: absolute;
         width: 100%;
@@ -81,20 +109,29 @@
         cursor: pointer;
         z-index: 2;
     }
+    
     .main-upload-box {
         width: 250px;
         height: 250px;
     }
+    
     .upload-icon {
         font-size: 2rem;
         color: #6c757d;
         margin-bottom: 10px;
+        transition: color 0.3s;
     }
+    
+    [data-bs-theme="dark"] .upload-icon {
+        color: #adb5bd;
+    }
+    
     .upload-preview {
         width: 100%;
         height: 100%;
         object-fit: cover;
     }
+    
     .photo-controls {
         position: absolute;
         bottom: 0;
@@ -109,17 +146,21 @@
         opacity: 0;
         transition: opacity 0.2s;
     }
+    
     .photo-upload-box:hover .photo-controls {
         opacity: 1;
     }
+    
     .set-main-btn {
         cursor: pointer;
         color: white;
     }
+    
     .delete-photo-btn {
         cursor: pointer;
         color: white;
     }
+    
     .add-more-photos {
         display: flex;
         flex-direction: column;
@@ -128,9 +169,44 @@
         text-align: center;
         font-size: 0.9rem;
     }
+    
     .cross-icon {
         font-size: 2.5rem;
         color: #6c757d;
+        transition: color 0.3s;
+    }
+    
+    [data-bs-theme="dark"] .cross-icon {
+        color: #adb5bd;
+    }
+    
+    [data-bs-theme="dark"] .modal-content {
+        background-color: #343a40;
+        color: #f8f9fa;
+        border-color: #495057;
+    }
+    
+    [data-bs-theme="dark"] .modal-header,
+    [data-bs-theme="dark"] .modal-footer {
+        border-color: #495057;
+    }
+    
+    [data-bs-theme="dark"] .btn-close {
+        filter: brightness(0) invert(1);
+    }
+    
+    [data-bs-theme="dark"] .text-muted {
+        color: #adb5bd !important;
+    }
+    
+    [data-bs-theme="dark"] .form-text {
+        color: #adb5bd;
+    }
+    
+    [data-bs-theme="dark"] .alert-info {
+        background-color: #0d4a76;
+        border-color: #055688;
+        color: #f8f9fa;
     }
 </style>
 {% endblock %}
@@ -788,6 +864,31 @@
         $('#new-model-name').on('input', function() {
             $(this).removeClass('is-invalid');
         });
+
+        // Listen for theme changes to update styling of specific elements
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.attributeName === 'data-bs-theme') {
+                    updateThemeSpecificStyles();
+                }
+            });
+        });
+        
+        observer.observe(document.documentElement, { attributes: true });
+        
+        function updateThemeSpecificStyles() {
+            const isDarkTheme = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+            
+            // Update form close button visibility in dark mode
+            if (isDarkTheme) {
+                $('.btn-close').addClass('btn-close-white');
+            } else {
+                $('.btn-close').removeClass('btn-close-white');
+            }
+        }
+        
+        // Initialize theme-specific styles
+        updateThemeSpecificStyles();
     });
 </script>
 {% endblock %}

@@ -1,0 +1,48 @@
+<button class="btn btn-primary rounded-circle chatbot-toggle" id="chatbot-toggle">
+    <i class="fas fa-comment"></i>
+</button>
+
+<div class="chatbot-widget" id="chatbot-widget">
+    <div class="chatbot-header">
+        <h5>Dongelek Assistant</h5>
+        <div>
+            <button class="btn btn-sm text-white" id="minimize-btn">
+                <i class="fas fa-minus"></i>
+            </button>
+            <button class="btn btn-sm text-white" id="close-btn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+    
+    <div class="chatbot-body">
+        <div class="chatbot-messages" id="chatbot-messages">
+            <div class="message bot-message">
+                <div class="message-content">
+                    <p>Привет! Я помощник Dongelek. Чем я могу помочь вам сегодня?</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chatbot-input">
+            <form id="chatbot-form">
+                <div class="input-group">
+                    <input type="text" id="user-input" class="form-control" placeholder="Введите ваш вопрос...">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="chatbot-footer">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="ai-toggle" checked>
+                <label class="form-check-label" for="ai-toggle">Продвинутый режим</label>
+            </div>
+            <div>
+                <a href="{% url 'chatbot_history' %}" class="text-muted small">История</a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -177,8 +177,38 @@
                     <i class="fas fa-user-circle fa-3x text-secondary"></i>
                 </div>
                 <div>
-                    <h5 class="mb-0">{{ car.seller.get_full_name|default:car.seller.email }}</h5>
+                    <h5 class="mb-0">
+                        {% if car.seller.username %}
+                        <a href="{% url 'profile_detail' username=car.seller.username %}" class="text-decoration-none text-dark">
+                            {{ car.seller.get_full_name|default:car.seller.username }}
+                        </a>
+                        {% else %}
+                        {{ car.seller.get_full_name|default:"Anonymous" }}
+                        {% endif %}
+                    </h5>
                     <p class="text-muted mb-0">Member since {{ car.seller.date_joined|date:"F Y" }}</p>
+                    
+                    <!-- Seller Rating -->
+                    {% if avg_seller_rating %}
+                    <div class="d-flex align-items-center mt-1">
+                        <div class="me-2">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= avg_seller_rating|floatformat:"0" %}
+                                    <i class="fas fa-star text-warning"></i>
+                                {% elif forloop.counter <= avg_seller_rating|add:"0.5"|floatformat:"0" %}
+                                    <i class="fas fa-star-half-alt text-warning"></i>
+                                {% else %}
+                                    <i class="far fa-star text-warning"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <span>{{ avg_seller_rating|floatformat:1 }} <small class="text-muted">({{ seller_review_count }} reviews)</small></span>
+                    </div>
+                    {% else %}
+                    <div class="mt-1">
+                        <small class="text-muted">No reviews yet</small>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
             
@@ -191,6 +221,11 @@
                 <a href="tel:+7XXXXXXXXXX" class="btn btn-outline-primary">
                     <i class="fas fa-phone-alt me-2"></i> Call Seller
                 </a>
+                {% if user.is_authenticated and user != car.seller %}
+                <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#reviewSellerModal">
+                    <i class="fas fa-star me-2"></i> Rate Seller
+                </button>
+                {% endif %}
             </div>
             
             <hr>
@@ -199,6 +234,54 @@
                 <small>Posted: {{ car.created_at|date:"d.m.Y" }}</small>
                 <small>Views: {{ car.views_count }}</small>
             </div>
+            
+            <!-- Seller Reviews Preview -->
+            {% if seller_reviews %}
+            <hr>
+            <div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="mb-0">Recent Seller Reviews</h6>
+                    <div>
+                        <a href="#sellerReviews" class="text-decoration-none small me-2">View on Page</a>
+                        {% if car.seller.username %}
+                        <a href="{% url 'profile_detail' username=car.seller.username %}#reviews" class="text-decoration-none small">View Profile</a>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                {% for review in seller_reviews|slice:":2" %}
+                    {% if review.reviewer != user or not user.is_authenticated %}
+                    <div class="mt-2 pb-2 {% if not forloop.last %}border-bottom{% endif %}">
+                        <div class="mb-1">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= review.rating %}
+                                    <i class="fas fa-star text-warning"></i>
+                                {% else %}
+                                    <i class="far fa-star text-warning"></i>
+                                {% endif %}
+                            {% endfor %}
+                            {% if review.is_verified %}
+                                <span class="badge bg-success ms-1">Verified</span>
+                            {% endif %}
+                        </div>
+                        <p class="mb-1 small">{{ review.comment|truncatechars:100 }}</p>
+                        <div class="d-flex justify-content-between">
+                            <small class="text-muted">
+                                {% if review.reviewer.username %}
+                                <a href="{% url 'profile_detail' username=review.reviewer.username %}" class="text-decoration-none text-muted">
+                                    {{ review.reviewer.username }}
+                                </a>
+                                {% else %}
+                                {{ review.reviewer.username }}
+                                {% endif %}
+                            </small>
+                            <small class="text-muted">{{ review.created_at|date:"d.m.Y" }}</small>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {% endif %}
         </div>
         
         {% if car.seller == user %}
@@ -279,6 +362,133 @@
             </div>
         </div>
     </div>
+</div>
+
+<!-- Add a modal for reviewing seller -->
+<div class="modal fade" id="reviewSellerModal" tabindex="-1" aria-labelledby="reviewSellerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reviewSellerModalLabel">Rate & Review Seller</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {% if user.is_authenticated and user != car.seller %}
+                    {% if user_review %}
+                        <div class="alert alert-info">
+                            <strong>You've already reviewed this seller.</strong> You can update your review below.
+                        </div>
+                    {% endif %}
+                    
+                    <form method="post" action="{% url 'add_seller_review' car.seller.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="car_id" value="{{ car.id }}">
+                        <input type="hidden" name="next" value="{{ request.path }}">
+                        
+                        <div class="mb-3">
+                            <label for="id_rating" class="form-label">Rating</label>
+                            <select name="rating" id="id_rating" class="form-select" required>
+                                {% for value, text in seller_review_form.fields.rating.choices %}
+                                    <option value="{{ value }}" {% if user_review and user_review.rating == value %}selected{% endif %}>{{ text }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_comment" class="form-label">Comment</label>
+                            <textarea name="comment" id="id_comment" class="form-control" rows="4" placeholder="Share your experience with this seller..." required>{% if user_review %}{{ user_review.comment }}{% endif %}</textarea>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">
+                                {% if user_review %}Update{% else %}Submit{% endif %} Review
+                            </button>
+                        </div>
+                        
+                        {% if user_review %}
+                        <hr>
+                        <div class="text-end">
+                            <a href="{% url 'delete_seller_review' user_review.id %}?next={{ request.path|urlencode }}" class="btn btn-sm btn-outline-danger">
+                                <i class="fas fa-trash-alt"></i> Delete Review
+                            </a>
+                        </div>
+                        {% endif %}
+                    </form>
+                {% else %}
+                    <div class="text-center py-4">
+                        <p>You need to log in to review this seller.</p>
+                        <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-primary">Log In</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Seller Reviews Section -->
+<div id="sellerReviews" class="mt-5">
+    <h4>
+        Seller Reviews 
+        {% if car.seller.username %}
+        <small class="fs-6">
+            <a href="{% url 'profile_detail' username=car.seller.username %}" class="text-decoration-none">
+                View Seller Profile <i class="fas fa-external-link-alt"></i>
+            </a>
+        </small>
+        {% endif %}
+    </h4>
+    
+    {% if seller_reviews %}
+        <div class="list-group mt-3">
+            {% for review in seller_reviews %}
+                <div class="list-group-item">
+                    <div class="d-flex align-items-start">
+                        <div class="me-3">
+                            <i class="fas fa-user-circle fa-2x text-secondary"></i>
+                        </div>
+                        <div class="w-100">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-0">
+                                        {% if review.reviewer.username %}
+                                        <a href="{% url 'profile_detail' username=review.reviewer.username %}" class="text-decoration-none text-dark">
+                                            {{ review.reviewer.get_full_name|default:review.reviewer.username }}
+                                        </a>
+                                        {% else %}
+                                        {{ review.reviewer.get_full_name|default:review.reviewer.username }}
+                                        {% endif %}
+                                    </h6>
+                                    <div class="mb-2">
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= review.rating %}
+                                                <i class="fas fa-star text-warning"></i>
+                                            {% else %}
+                                                <i class="far fa-star text-warning"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if review.is_verified %}
+                                            <span class="badge bg-success ms-2">Verified</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <small class="text-muted">{{ review.created_at|date:"F d, Y" }}
+                                    {% if review.is_edited %}
+                                    (edited)
+                                    {% endif %}
+                                </small>
+                            </div>
+                            <p class="mb-0">{{ review.comment }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-light text-center">
+            <p class="mb-0">No reviews yet for this seller.</p>
+        </div>
+    {% endif %}
 </div>
 {% endblock %}
 

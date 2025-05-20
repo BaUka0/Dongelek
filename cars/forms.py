@@ -1,5 +1,5 @@
 from django import forms
-from .models import Car, CarImage, Brand, CarModel, City, Region
+from .models import Car, CarImage, Brand, CarModel, City, Region, SellerReview
 from django.utils.translation import gettext_lazy as _
 
 
@@ -67,3 +67,17 @@ CarImageFormSet = forms.inlineformset_factory(
     extra=1, can_delete=True, max_num=10,
     validate_max=True
 )
+
+
+class SellerReviewForm(forms.ModelForm):
+    class Meta:
+        model = SellerReview
+        fields = ['rating', 'comment']
+        widgets = {
+            'rating': forms.Select(attrs={'class': 'form-select'}),
+            'comment': forms.Textarea(attrs={
+                'class': 'form-control', 
+                'rows': 4, 
+                'placeholder': 'Share your experience with this seller...'
+            }),
+        }

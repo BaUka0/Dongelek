@@ -1,6 +1,6 @@
-# Dongelek - Remaining Implementation Tasks
+# Dongelek - Implementation Status
 
-## Currently Implemented
+## Already Implemented ✅
 - Basic car listing and browsing functionality
 - User authentication (login/register)
 - Car details pages with images and specifications
@@ -9,8 +9,10 @@
 - Search with filters
 - Messaging system between buyers and sellers
 - Real-time notifications via WebSockets
+- Reviewing Sellers and rating system
+- NLP-Based Chatbot with basic NLTK functionality and io.net integration
 
-## Missing Features
+## Missing Features ❌
 
 ### High Priority
 1. **AI-Based Recommendations System**
@@ -18,54 +20,29 @@
    - Train model based on user browsing history and preferences
    - Integrate recommendations API into the homepage
 
-2. **NLP-Based Chatbot**
-   - Implement basic chatbot using spaCy/NLTK
-   - Create FAQ responses and common queries handling
-   - Integrate with io.net for complex queries
-   - Build chatbot UI interface
+2. ~~**NLP-Based Chatbot**~~ ✅
+   - ~~Implement basic chatbot using spaCy/NLTK~~
+   - ~~Create FAQ responses and common queries handling~~
+   - ~~Integrate with io.net for complex queries~~
+   - ~~Build chatbot UI interface~~
 
-3. **User Rating System**
-   - Create seller rating model and system
-   - Implement verification for legitimate reviews
-   - Add rating display on seller profiles
-   - Build review submission interface
+3. ~~**User Rating System**~~ ✅
+   - ~~Create seller rating model and system~~
+   - ~~Implement verification for legitimate reviews~~
+   - ~~Add rating display on seller profiles~~
+   - ~~Build review submission interface~~
 
 ### Medium Priority
-4. **Car History/Verification**
-   - Implement car verification system
-   - Create verification badges for trusted sellers
-   - Integrate with external services for car history
 
-5. **Multi-language Support**
+4. **Multi-language Support**
    - Implement i18n for Russian and Kazakh languages
    - Add language switcher to the UI
    - Translate all static content and templates
 
-6. **Enhanced Analytics for Sellers**
+5. **Enhanced Analytics for Sellers**
    - Create analytics dashboard for sellers
    - Implement view tracking and interest metrics
    - Visualize data with charts and graphs
-
-### Low Priority
-7. **360° Car View Support**
-   - Add support for 360° image viewing
-   - Create UI controls for 360° navigation
-   - Implement image processing for 360° views
-
-8. **Financial Services Integration**
-   - Create auto loan application system
-   - Implement insurance quote feature
-   - Build calculator for loan payments
-
-9. **Community Features**
-   - Create forum or discussion board
-   - Implement car-related topic categories
-   - Build reputation system for community users
-
-10. **Mobile App Development**
-    - Design mobile app interfaces
-    - Implement API endpoints for mobile app
-    - Create native iOS and Android applications
 
 ## Technical Debt
 1. **Improve Test Coverage**
@@ -82,3 +59,24 @@
    - Conduct security audit
    - Implement additional authentication measures
    - Add rate limiting for API endpoints
+
+## Additional Missing Features (Based on Technical Requirements)
+1. **Admin Panel Enhancement**
+   - Complete implementation of admin approval workflow for sellers
+   - Add dispute resolution system
+   - Implement comprehensive monitoring tools
+
+2. **Email Notifications**
+   - Integrate with Yandex SMTP for email notifications
+   - Create email templates for various notifications
+   - Implement notification preferences
+
+3. **User Experience Improvements**
+   - Ensure compliance with Nielsen's 10 usability heuristics
+   - Implement F and Z patterns for content placement
+   - Enhance minimalist design philosophy
+
+4. **Car Maintenance Reminders**
+   - Create car maintenance tracking system
+   - Implement reminder notifications for owners
+   - Build maintenance history tracking
