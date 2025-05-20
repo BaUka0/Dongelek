@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dongelek - Car Marketplace{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .card {
+            transition: transform 0.3s;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .car-image {
+            height: 200px;
+            object-fit: cover;
+        }
+        .card-body {
+            padding: 1.25rem;
+        }
+        .card-title {
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        /* Updated favorite button styling to work inline instead of absolute positioning */
+        .favorite-btn {
+            background-color: white;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .favorite-btn.card-corner {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        .favorite-btn:hover {
+            background-color: #f8f9fa;
+        }
+        .favorite-btn i {
+            color: #dc3545;
+        }
+        .price-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .form-control {
+            border-radius: 0.25rem;
+        }
+        .btn {
+            border-radius: 0.25rem;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <strong>Dongelek</strong>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'car_list' %}">Cars</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'car_create' %}">Sell a Car</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'favorite_list' %}">Favorites</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link position-relative" href="{% url 'compare_list' %}">
+                            <i class="fas fa-balance-scale"></i> Compare
+                            <span id="compare-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary" style="display: none;">
+                                <span id="compare-count">0</span>
+                                <span class="visually-hidden">cars to compare</span>
+                            </span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link position-relative" href="{% url 'inbox' %}">
+                            <i class="fas fa-inbox"></i> Messages
+                            <span id="unread-message-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none;">
+                                <span id="unread-message-count">0</span>
+                                <span class="visually-hidden">unread messages</span>
+                            </span>
+                        </a>
+                    </li>
+                    <li id="notification-status" class="nav-item d-none">
+                        <span class="nav-link text-warning">
+                            <i class="fas fa-exclamation-triangle"></i> Notifications offline
+                        </span>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            {% if user.avatar %}
+                                <img src="{{ user.avatar.url }}" alt="Avatar" class="rounded-circle" style="width: 25px; height: 25px; object-fit: cover;">
+                            {% endif %}
+                            {{ user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'profile' %}">Profile</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'signup' %}">Register</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-4">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="bg-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Dongelek Car Marketplace</h5>
+                    <p class="text-muted">The best place to buy and sell cars in Kazakhstan</p>
+                </div>
+                <div class="col-md-3">
+                    <h5>Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'car_list' %}" class="text-decoration-none">Cars</a></li>
+                        <li><a href="#" class="text-decoration-none">About Us</a></li>
+                        <li><a href="#" class="text-decoration-none">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Contact</h5>
+                    <address class="text-muted">
+                        <p>123 Car Street<br>Almaty, Kazakhstan</p>
+                        <p>Email: info@dongelek.kz<br>Phone: +7 777 123 4567</p>
+                    </address>
+                </div>
+            </div>
+            <hr>
+            <div class="text-center">
+                <p class="text-muted">&copy; 2025 Dongelek. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        // Toggle favorite functionality
+        $(document).ready(function() {
+            $('.favorite-btn').click(function(e) {
+                e.preventDefault();
+                const btn = $(this);
+                const carId = btn.data('car-id');
+
+                $.ajax({
+                    url: `/cars/favorite/${carId}/`,
+                    type: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    success: function(data) {
+                        if (data.is_favorite) {
+                            btn.find('i').removeClass('far').addClass('fas');
+                            // Update button text if on detail page
+                            if (btn.hasClass('btn')) {
+                                btn.removeClass('btn-outline-danger').addClass('btn-danger');
+                                if (btn.find('span').length > 0) {
+                                    btn.find('span').text('Remove from Favorites');
+                                }
+                            }
+                        } else {
+                            btn.find('i').removeClass('fas').addClass('far');
+                            // Update button text if on detail page
+                            if (btn.hasClass('btn')) {
+                                btn.removeClass('btn-danger').addClass('btn-outline-danger');
+                                if (btn.find('span').length > 0) {
+                                    btn.find('span').text('Add to Favorites');
+                                }
+                            }
+                        }
+                        
+                        // If we're on the favorites page, consider removing the card if unfavorited
+                        if (!data.is_favorite && window.location.pathname.includes('/cars/favorite/list/')) {
+                            btn.closest('.col').fadeOut('slow', function() {
+                                $(this).remove();
+                                // If no more favorites, show the empty state
+                                if ($('.col').length === 0) {
+                                    location.reload();
+                                }
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error toggling favorite:", error);
+                        console.log("Status:", xhr.status);
+                        console.log("Response:", xhr.responseText);
+                        alert("Could not update favorites. Please try again.");
+                    }
+                });
+            });
+        });
+        
+        // Function to get CSRF token from cookies
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        {% if user.is_authenticated %}
+        // Check for cars in compare list and update the badge
+        function updateCompareCount() {
+            $.ajax({
+                url: "{% url 'compare_list' %}",
+                type: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                success: function(data) {
+                    // Count the number of cars in the compare list
+                    // We can get this from the HTML response by counting the table rows (minus header)
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(data, 'text/html');
+                    const carRows = doc.querySelectorAll('.table tbody tr:first-child td');
+                    const carCount = carRows.length > 0 ? carRows.length - 1 : 0; // Subtract 1 for the header column
+                    
+                    // Update the badge
+                    const badge = document.getElementById('compare-badge');
+                    const count = document.getElementById('compare-count');
+                    
+                    if (carCount > 0) {
+                        count.textContent = carCount;
+                        badge.style.display = 'block';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                },
+                error: function() {
+                    console.log("Error fetching compare count");
+                }
+            });
+        }
+        
+        // Check compare count when page loads
+        $(document).ready(function() {
+            updateCompareCount();
+        });
+        {% endif %}
+    </script>
+
+    {% block extra_js %}
+        {% if user.is_authenticated %}
+<script>
+    // Connection for real-time notifications
+    function connectNotificationSocket() {
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const notifySocket = new WebSocket(`${wsProtocol}//${window.location.host}/ws/notifications/`);
+        
+        let reconnectAttempts = 0;
+        const maxReconnectAttempts = 5;
+        const reconnectDelay = 5000; // 5 seconds between reconnect attempts
+
+        notifySocket.onopen = function(e) {
+            console.log("WebSocket connection established");
+            reconnectAttempts = 0;
+            document.getElementById('notification-status').classList.add('d-none');
+        };
+
+        notifySocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            if (data.type === 'new_message') {
+                // Update unread message count
+                const badge = document.getElementById('unread-message-badge');
+                const count = document.getElementById('unread-message-count');
+
+                count.textContent = data.unread_count;
+                badge.style.display = data.unread_count > 0 ? 'block' : 'none';
+
+                // Show notification if not in conversation
+                if (window.location.pathname !== `/chat/conversation/${data.conversation_id}/`) {
+                    // Create browser notification if supported
+                    if ("Notification" in window && Notification.permission === "granted") {
+                        new Notification(`New message from ${data.sender_name}`, {
+                            body: data.message,
+                            icon: '/static/img/logo.png'
+                        });
+                    }
+                }
+            }
+        };
+
+        notifySocket.onclose = function(e) {
+            // Show notification offline status
+            document.getElementById('notification-status').classList.remove('d-none');
+            
+            // Only try to reconnect if we haven't exceeded max attempts
+            if (reconnectAttempts < maxReconnectAttempts) {
+                reconnectAttempts++;
+                console.log(`WebSocket connection closed. Reconnect attempt ${reconnectAttempts}/${maxReconnectAttempts} in ${reconnectDelay/1000} seconds...`);
+                
+                setTimeout(function() {
+                    connectNotificationSocket();
+                }, reconnectDelay);
+            } else {
+                console.log("WebSocket connection closed permanently after maximum reconnect attempts.");
+                // Update UI to indicate offline status
+            }
+        };
+        
+        notifySocket.onerror = function(e) {
+            console.log("WebSocket error occurred.");
+            // Don't spam the console with error messages
+        };
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Request notification permission
+        if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
+            Notification.requestPermission();
+        }
+
+        // Try to connect to notification socket, but don't crash if it fails
+        try {
+            connectNotificationSocket();
+        } catch (e) {
+            console.error("Failed to connect to notification socket:", e);
+        }
+    });
+</script>
+{% endif %}
+        {% if user.is_authenticated %}
+        <!-- Check for unread messages -->
+        <script>
+            function checkUnreadMessages() {
+                $.ajax({
+                    url: "{% url 'check_new_messages' %}",
+                    type: 'GET',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    success: function(data) {
+                        const unreadCount = data.unread_count;
+                        const badge = $('#unread-message-badge');
+                        const count = $('#unread-message-count');
+
+                        if (unreadCount > 0) {
+                            count.text(unreadCount);
+                            badge.show();
+                        } else {
+                            badge.hide();
+                        }
+                    }
+                });
+            }
+
+            // Check when page loads
+            checkUnreadMessages();
+
+            // Check periodically (every 30 seconds)
+            setInterval(checkUnreadMessages, 30000);
+        </script>
+        {% endif %}
+    {% endblock %}
+</body>
+</html>

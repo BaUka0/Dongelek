@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Активация аккаунта на сайте Dongelek</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .content {
+            padding: 20px 0;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+        .footer {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 12px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Dongelek - Активация аккаунта</h2>
+        </div>
+        <div class="content">
+            <p>Здравствуйте, {{ user.username }}!</p>
+            <p>Спасибо за регистрацию на сайте Dongelek. Для активации вашего аккаунта, пожалуйста, перейдите по следующей ссылке:</p>
+            <p style="text-align: center;">
+                <a href="http://{{ domain }}{% url 'activate' uidb64=uid token=token %}" class="button">Активировать аккаунт</a>
+            </p>
+            <p>Если кнопка не работает, скопируйте следующую ссылку в адресную строку браузера:</p>
+            <p>http://{{ domain }}{% url 'activate' uidb64=uid token=token %}</p>
+            <p>С уважением,<br>Команда Dongelek</p>
+        </div>
+        <div class="footer">
+            <p>Если вы не регистрировались на нашем сайте, проигнорируйте это письмо.</p>
+            <p>&copy; 2025 Dongelek. Все права защищены.</p>
+        </div>
+    </div>
+</body>
+</html>

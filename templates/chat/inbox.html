@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}My Messages - Dongelek{% endblock %}
+
+{% block extra_css %}
+<style>
+    .conversation-list {
+        max-height: 600px;
+        overflow-y: auto;
+    }
+    .conversation-item {
+        transition: background-color 0.2s;
+        border-left: 4px solid transparent;
+    }
+    .conversation-item:hover {
+        background-color: #f8f9fa;
+    }
+    .conversation-item.active {
+        border-left: 4px solid #0d6efd;
+        background-color: #f0f7ff;
+    }
+    .unread-badge {
+        background-color: #0d6efd;
+        color: white;
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 50%;
+    }
+    .message-preview {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 200px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">My Messages</h1>
+
+{% if conversations %}
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Conversations</h5>
+                </div>
+                <div class="list-group list-group-flush conversation-list">
+                    {% for conversation in conversations %}
+                        <a href="{% url 'conversation_detail' conversation.id %}" class="list-group-item list-group-item-action conversation-item {% if conversation.id == active_conversation.id %}active{% endif %}">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-1">
+                                    {% if conversation.buyer == request.user %}
+                                        {{ conversation.seller.get_full_name|default:conversation.seller.email }}
+                                    {% else %}
+                                        {{ conversation.buyer.get_full_name|default:conversation.buyer.email }}
+                                    {% endif %}
+                                </h6>
+                                {% if conversation.unread_count > 0 %}
+                                    <span class="unread-badge">{{ conversation.unread_count }}</span>
+                                {% endif %}
+                            </div>
+                            <p class="mb-1 text-muted small">{{ conversation.car.brand }} {{ conversation.car.model }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="message-preview text-muted">
+                                    {% with last_message=conversation.messages.last %}
+                                        {% if last_message %}
+                                            {% if last_message.sender == request.user %}
+                                                You: {{ last_message.content }}
+                                            {% else %}
+                                                {{ last_message.content }}
+                                            {% endif %}
+                                        {% else %}
+                                            No messages yet
+                                        {% endif %}
+                                    {% endwith %}
+                                </span>
+                                <small class="text-muted">
+                                    {% if conversation.last_message_time %}
+                                        {{ conversation.last_message_time|date:"d.m.Y" }}
+                                    {% else %}
+                                        {{ conversation.created_at|date:"d.m.Y" }}
+                                    {% endif %}
+                                </small>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-8">
+            {% if active_conversation %}
+                {% include 'chat/conversation_detail.html' %}
+            {% else %}
+                <div class="card">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-comments fa-5x text-muted mb-3"></i>
+                        <h4>Select a conversation</h4>
+                        <p class="text-muted">Choose a conversation from the list to view messages</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% else %}
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-comment-slash fa-5x text-muted mb-3"></i>
+            <h4>No conversations yet</h4>
+            <p class="text-muted">When you start a conversation with a car seller, it will appear here</p>
+            <a href="{% url 'car_list' %}" class="btn btn-primary mt-3">Browse Cars</a>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

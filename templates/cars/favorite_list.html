@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Favorites - Dongelek{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">My Favorite Cars</h2>
+    
+    {% if favorites %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for favorite in favorites %}
+                <div class="col">
+                    <div class="card h-100">
+                        <a href="{{ favorite.car.get_absolute_url }}">
+                            {% with main_image=favorite.car.images.filter.first %}
+                                {% if main_image %}
+                                    <img src="{{ main_image.image.url }}" class="card-img-top car-image" alt="{{ favorite.car }}">
+                                {% else %}
+                                    <img src="{% static 'cars/images/placeholder.jpg' %}" class="card-img-top car-image" alt="No image available">
+                                {% endif %}
+                            {% endwith %}
+                        </a>
+                        
+                        <div class="card-body">
+                            <a href="{{ favorite.car.get_absolute_url }}" class="text-decoration-none text-dark">
+                                <h5 class="card-title">{{ favorite.car.brand }} {{ favorite.car.model }}</h5>
+                            </a>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ favorite.car.year }} • {{ favorite.car.mileage }} km</h6>
+                            
+                            <!-- Price and favorite button in one row -->
+                            <div class="price-container mb-2">
+                                <p class="card-text fw-bold text-primary mb-0">{{ favorite.car.price }} ₸</p>
+                                <div class="d-flex">
+                                    <button class="favorite-btn me-2" data-car-id="{{ favorite.car.id }}">
+                                        <i class="fas fa-heart"></i>
+                                    </button>
+                                    <a href="{% url 'add_to_compare' favorite.car.id %}?next={{ request.get_full_path|urlencode }}" class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-balance-scale"></i> Сравнить
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <small class="text-muted">{{ favorite.car.city }}, {{ favorite.car.region }}</small>
+                                <small class="text-muted">Added: {{ favorite.created_at|date:"d.m.Y" }}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info" role="alert">
+            <h4 class="alert-heading">No favorite cars yet!</h4>
+            <p>You haven't added any cars to your favorites list. Browse our car listings and click the heart icon to add cars to your favorites.</p>
+            <hr>
+            <div class="text-center">
+                <a href="{% url 'car_list' %}" class="btn btn-primary">Browse Cars</a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // This page-specific script now uses the global favorite button handler
+    // which is already defined in base.html
+</script>
+{% endblock %}

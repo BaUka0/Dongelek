@@ -1,0 +1,364 @@
+{% extends 'base.html' %}
+
+{% block title %}Профильді өзгерту | Dongelek{% endblock %}
+
+{% block content %}
+<section class="auth-section profile-section">
+    <div class="auth-container profile-container wide-container">
+        <div class="auth-header">
+            <h1 class="auth-title">Профильді өзгерту</h1>
+            <p class="auth-subtitle">Жеке деректеріңізді жаңартыңыз</p>
+        </div>
+        
+        <div class="profile-content">
+            <div class="profile-avatar-section">
+                <div class="profile-avatar">
+                    <div class="avatar-wrapper">
+                        {% if user.avatar %}
+                            <img src="{{ user.avatar.url }}" alt="{{ user.username }}" class="avatar-preview" id="current-avatar">
+                        {% else %}
+                            <div class="avatar-placeholder" id="avatar-placeholder">
+                                <i class="fas fa-user"></i>
+                            </div>
+                        {% endif %}
+                        <div id="avatar-preview-container" class="avatar-preview-container" style="display: none;">
+                            <img id="avatar-preview" class="avatar-preview" src="" alt="Preview">
+                        </div>
+                        
+                        <div class="avatar-controls">
+                            <label for="id_avatar" class="avatar-upload-btn">
+                                <i class="fas fa-camera"></i>
+                                <span>Жаңа сурет</span>
+                            </label>
+                            {% if user.avatar %}
+                            <button type="button" id="delete-avatar-btn" class="avatar-delete-btn">
+                                <i class="fas fa-trash"></i>
+                                <span>Жою</span>
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                
+                    <div class="profile-username">
+                        <h3>{{ user.username }}</h3>
+                        <p class="profile-date">Тіркелген: {{ user.date_joined|date:"d.m.Y" }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="profile-form-section">
+                <form method="post" enctype="multipart/form-data" class="auth-form" id="profile-form">
+                    {% csrf_token %}
+                    
+                    <input type="hidden" name="remove_avatar" id="remove-avatar" value="false">
+                    
+                    {% for field in form %}
+                        <div class="form-group {% if field.name == 'avatar' %}hidden-field{% endif %}">
+                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                            
+                            {% if field.name == 'avatar' %}
+                                {{ field }}
+                            {% else %}
+                                {{ field }}
+                            {% endif %}
+                            
+                            {% if field.errors %}
+                                <div class="field-errors">
+                                    {% for error in field.errors %}
+                                        <p class="error-message">{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            
+                            {% if field.help_text %}
+                                <p class="help-text">{{ field.help_text|safe }}</p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fas fa-save"></i> Сақтау
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="auth-links">
+            <a href="{% url 'index' %}" class="auth-link">
+                <i class="fas fa-arrow-left"></i> Басты бетке оралу
+            </a>
+        </div>
+    </div>
+</section>
+
+<div id="confirm-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2>Аватарды жою</h2>
+        <p>Сіз аватарыңызды жойғыңыз келе ме?</p>
+        <div class="modal-actions">
+            <button id="confirm-delete" class="btn btn-danger">Иә, жою</button>
+            <button id="cancel-delete" class="btn btn-secondary">Жоқ</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get DOM elements
+        const fileInput = document.querySelector('input[type="file"]');
+        const avatarPlaceholder = document.getElementById('avatar-placeholder');
+        const currentAvatar = document.getElementById('current-avatar');
+        const previewContainer = document.getElementById('avatar-preview-container');
+        const previewImg = document.getElementById('avatar-preview');
+        const removeAvatarField = document.getElementById('remove-avatar');
+        const deleteAvatarBtn = document.getElementById('delete-avatar-btn');
+        const confirmModal = document.getElementById('confirm-modal');
+        const closeModal = document.querySelector('.close-modal');
+        const confirmDelete = document.getElementById('confirm-delete');
+        const cancelDelete = document.getElementById('cancel-delete');
+        const profileForm = document.getElementById('profile-form');
+        
+        // Handle file selection
+        fileInput.addEventListener('change', function() {
+            if (this.files && this.files.length > 0) {
+                const file = this.files[0];
+                
+                // Check if file is an image
+                if (!file.type.match('image.*')) {
+                    alert('Тек қана сурет файлдарын таңдаңыз.');
+                    return;
+                }
+                
+                // Check file size (max 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Файл өлшемі 5MB аспауы керек.');
+                    return;
+                }
+                
+                // Show preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Hide current avatar or placeholder
+                    if (currentAvatar) currentAvatar.style.display = 'none';
+                    if (avatarPlaceholder) avatarPlaceholder.style.display = 'none';
+                    
+                    // Show preview
+                    previewImg.src = e.target.result;
+                    previewContainer.style.display = 'block';
+                    
+                    // Reset remove avatar flag if a new image is selected
+                    if (removeAvatarField) removeAvatarField.value = 'false';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // Handle delete avatar button click
+        if (deleteAvatarBtn) {
+            deleteAvatarBtn.addEventListener('click', function() {
+                confirmModal.style.display = 'flex';
+            });
+        }
+        
+        // Close modal when clicking the X
+        if (closeModal) {
+            closeModal.addEventListener('click', function() {
+                confirmModal.style.display = 'none';
+            });
+        }
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            if (event.target === confirmModal) {
+                confirmModal.style.display = 'none';
+            }
+        });
+        
+        // Handle confirm delete
+        if (confirmDelete) {
+            confirmDelete.addEventListener('click', function() {
+                removeAvatarField.value = 'true';
+                
+                // Submit the form to apply changes immediately
+                if (profileForm) {
+                    profileForm.submit();
+                }
+                
+                confirmModal.style.display = 'none';
+            });
+        }
+        
+        // Handle cancel delete
+        if (cancelDelete) {
+            cancelDelete.addEventListener('click', function() {
+                confirmModal.style.display = 'none';
+            });
+        }
+        
+        // Apply dark mode colors
+        document.addEventListener('themeChanged', function(event) {
+            const isDarkMode = event.detail.theme === 'dark';
+            const avatarPlaceholder = document.querySelector('.avatar-placeholder');
+            
+            if (avatarPlaceholder) {
+                if (isDarkMode) {
+                    avatarPlaceholder.style.backgroundColor = 'var(--card-bg)';
+                } else {
+                    avatarPlaceholder.style.backgroundColor = 'var(--hover-bg)';
+                }
+            }
+        });
+        
+        // Initial check for dark mode
+        if (document.body.classList.contains('dark-mode')) {
+            const avatarPlaceholder = document.querySelector('.avatar-placeholder');
+            if (avatarPlaceholder) {
+                avatarPlaceholder.style.backgroundColor = 'var(--card-bg)';
+            }
+        }
+    });
+</script>
+
+<style>
+    /* Wider container for desktop */
+    .wide-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    
+    /* Improved profile content layout */
+    .profile-content {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+    
+    @media (min-width: 768px) {
+        .profile-content {
+            flex-direction: row;
+            align-items: flex-start;
+        }
+        
+        .profile-avatar-section {
+            flex: 0 0 30%;
+        }
+        
+        .profile-form-section {
+            flex: 0 0 65%;
+        }
+    }
+    
+    /* Modern avatar styling */
+    .avatar-wrapper {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+    
+    .avatar-preview, .avatar-placeholder {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin: 0 auto;
+        display: block;
+    }
+    
+    .avatar-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: var(--text-muted);
+    }
+    
+    .avatar-controls {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .avatar-upload-btn, .avatar-delete-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .avatar-upload-btn {
+        background-color: var(--primary-color);
+        color: white;
+    }
+    
+    .avatar-delete-btn {
+        background-color: var(--danger-color, #dc3545);
+        color: white;
+        border: none;
+    }
+    
+    .avatar-upload-btn:hover, .avatar-delete-btn:hover {
+        opacity: 0.9;
+    }
+    
+    /* Confirmation modal styling */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .modal-content {
+        background-color: var(--card-bg, white);
+        border-radius: 8px;
+        padding: 2rem;
+        position: relative;
+        width: 90%;
+        max-width: 500px;
+    }
+    
+    .close-modal {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+    
+    .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+    
+    /* Improved form styling */
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .hidden-field {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        border: 0;
+    }
+</style>
+{% endblock %}

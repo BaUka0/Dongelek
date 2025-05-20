@@ -1,0 +1,317 @@
+/**
+ * Global theme definitions for light/dark mode
+ * This is the foundation file that defines global variables used across the site
+ */
+
+/* Base variables for light mode */
+:root {
+    /* Colors */
+    --primary-color: #3b82f6;
+    --primary-hover: #2563eb;
+    --secondary-color: #2ecc71;
+    --secondary-hover: #27ae60;
+    --danger-color: #e74c3c;
+    --danger-hover: #c0392b;
+    --warning-color: #f39c12;
+    --warning-hover: #e67e22;
+    --info-color: #3b82f6;
+    --info-hover: #2563eb;
+    --success-color: #2ecc71;
+    --success-hover: #27ae60;
+
+    /* Text */
+    --text-color: #333333;
+    --text-muted: #718096;
+    --text-light: #ffffff;
+    --heading-color: #1a202c;
+    
+    /* Backgrounds */
+    --body-bg: #f8fafc;
+    --card-bg: #ffffff;
+    --input-bg: #ffffff;
+    --hover-bg: #f7fafc;
+    
+    /* Status colors backgrounds */
+    --error-bg: #fff5f5;
+    --warning-bg: #fffbeb;
+    --info-bg: #ebf8ff;
+    --success-bg: #d4edda;
+    
+    /* Status colors text */
+    --error-color: #e53e3e;
+    --warning-text: #b45309;
+    --info-text: #3182ce;
+    --success-text: #155724;
+    
+    /* Borders */
+    --border-color: #e2e8f0;
+    --border-color-dark: #cbd5e0;
+    --border-radius: 6px;
+    --border-radius-lg: 10px;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    
+    /* Animations */
+    --transition-speed: 0.3s;
+    
+    /* Spacing (используется более последовательная система) */
+    --space-1: 0.25rem;  /* 4px */
+    --space-2: 0.5rem;   /* 8px */
+    --space-3: 0.75rem;  /* 12px */
+    --space-4: 1rem;     /* 16px */
+    --space-5: 1.25rem;  /* 20px */
+    --space-6: 1.5rem;   /* 24px */
+    --space-8: 2rem;     /* 32px */
+    --space-10: 2.5rem;  /* 40px */
+    --space-12: 3rem;    /* 48px */
+    --space-16: 4rem;    /* 64px */
+}
+
+/* Dark mode overrides */
+.dark-mode {
+    /* Colors */
+    --primary-color: #60a5fa;
+    --primary-hover: #3b82f6;
+    --secondary-color: #10b981;
+    --secondary-hover: #059669;
+    --danger-color: #f87171;
+    --danger-hover: #ef4444;
+    --warning-color: #fbbf24;
+    --warning-hover: #f59e0b;
+    --info-color: #60a5fa;
+    --info-hover: #3b82f6;
+    --success-color: #34d399;
+    --success-hover: #10b981;
+
+    /* Text */
+    --text-color: #e2e8f0;
+    --text-muted: #94a3b8;
+    --heading-color: #f1f5f9;
+    
+    /* Backgrounds */
+    --body-bg: #0f172a;
+    --card-bg: #1e293b;
+    --input-bg: #2d3748;
+    --hover-bg: #2d3748;
+    
+    /* Status colors backgrounds */
+    --error-bg: #4a2428;
+    --warning-bg: #433420;
+    --info-bg: #1e3a5f;
+    --success-bg: #1c3a2b;
+    
+    /* Status colors text */
+    --error-color: #f87171;
+    --warning-text: #fbbf24;
+    --info-text: #60a5fa;
+    --success-text: #6ee7b7;
+    
+    /* Borders */
+    --border-color: #4a5568;
+    --border-color-dark: #1a202c;
+    
+    /* Shadows с улучшенным контрастом для темной темы */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
+}
+
+/* Unified transitions for smooth theme switching */
+body, button, a, input, select, textarea,
+.card, .form-control, .btn, .modal-content, 
+.form-container, .dropdown-menu, .nav-link,
+.car-item, .car-image img, .message,
+h1, h2, h3, h4, h5, h6, p, span, label, 
+.info-value, .car-detail, .car-meta, .car-seller,
+.car-price-tag, .auth-title, .auth-subtitle {
+    transition: background-color var(--transition-speed) ease, 
+                color var(--transition-speed) ease, 
+                border-color var(--transition-speed) ease, 
+                box-shadow var(--transition-speed) ease,
+                transform var(--transition-speed) ease;
+}
+
+/* Common dark mode element styles - сгруппированы для лучшей производительности */
+.dark-mode input, 
+.dark-mode select, 
+.dark-mode textarea {
+    background-color: var(--input-bg);
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+.dark-mode .btn-outline {
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+.dark-mode .btn-outline:hover {
+    background-color: var(--hover-bg);
+    color: var(--primary-color);
+}
+
+/* Оптимизированный селектор для select в темной теме */
+.dark-mode select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23e2e8f0' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+}
+
+/* Оптимизированная группировка для dark mode контейнеров */
+.dark-mode .card,
+.dark-mode .modal-content,
+.dark-mode .dropdown-menu,
+.dark-mode .form-container,
+.dark-mode .search-container,
+.dark-mode .sidebar-section,
+.dark-mode .catalog-header,
+.dark-mode .auth-container,
+.dark-mode .info-block,
+.dark-mode .car-main-image,
+.dark-mode .car-details-container {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+/* Оптимизация стилей сообщений для темной темы */
+.dark-mode .auth-message {
+    background-color: var(--info-bg);
+    color: var(--info-text);
+    border-left: 4px solid var(--info-color);
+}
+
+.dark-mode .auth-message i,
+.dark-mode .auth-error i {
+    color: currentColor;
+}
+
+.dark-mode .auth-error {
+    background-color: var(--error-bg);
+    color: var(--error-color);
+    border-left: 4px solid var(--error-color);
+}
+
+/* Оптимизированные стили заголовков блоков для темной темы */
+.dark-mode .info-block-title {
+    border-bottom-color: var(--border-color);
+}
+
+.dark-mode .car-title a,
+.dark-mode .info-block-title,
+.dark-mode .car-details-title,
+.dark-mode .auth-title {
+    color: var(--heading-color);
+}
+
+.dark-mode .car-actions,
+.dark-mode .info-block {
+    border-color: var(--border-color);
+}
+
+/* Оптимизированные стили текста для темной темы */
+.dark-mode h1, .dark-mode h2, .dark-mode h3, 
+.dark-mode h4, .dark-mode h5, .dark-mode h6 {
+    color: var(--heading-color);
+}
+
+.dark-mode p, .dark-mode span, .dark-mode label, 
+.dark-mode .car-detail, .dark-mode .car-description,
+.dark-mode .auth-subtitle, .dark-mode .form-label,
+.dark-mode .car-meta, .dark-mode .car-seller,
+.dark-mode .info-value, .dark-mode .help-text {
+    color: var(--text-color);
+}
+
+.dark-mode .text-muted,
+.dark-mode .info-label,
+.dark-mode .car-meta,
+.dark-mode .car-seller {
+    color: var(--text-muted);
+}
+
+/* Оптимизированные стили кнопок для темной темы */
+.dark-mode .btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.dark-mode .btn-primary:hover {
+    background-color: var(--primary-hover);
+}
+
+.dark-mode .btn-danger {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.dark-mode .btn-danger:hover {
+    background-color: var(--danger-hover);
+}
+
+/* Оптимизированные стили сообщений для темной темы */
+.dark-mode .message-success {
+    background-color: var(--success-bg);
+    border-left-color: var(--success-color);
+}
+
+.dark-mode .message-error {
+    background-color: var(--error-bg);
+    border-left-color: var(--danger-color);
+}
+
+.dark-mode .message-warning {
+    background-color: var(--warning-bg);
+    border-left-color: var(--warning-color);
+}
+
+.dark-mode .message-info {
+    background-color: var(--info-bg);
+    border-left-color: var(--info-color);
+}
+
+/* Оптимизированные стили выпадающих элементов для темной темы */
+.dark-mode .dropdown-item,
+.dark-mode button.dropdown-item {
+    color: var(--text-color);
+}
+
+.dark-mode .dropdown-item:hover,
+.dark-mode button.dropdown-item:hover {
+    color: var(--primary-color);
+    background-color: var(--hover-bg);
+}
+
+/* Оптимизированные стили форм для темной темы */
+.dark-mode .form-container input,
+.dark-mode .form-container textarea,
+.dark-mode .form-container select {
+    color: var(--text-color);
+    background-color: var(--input-bg);
+    border-color: var(--border-color);
+}
+
+.dark-mode .form-container label {
+    color: var(--text-color);
+}
+
+/* Utility классы для текста */
+.text-primary { color: var(--primary-color); }
+.text-secondary { color: var(--secondary-color); }
+.text-danger { color: var(--danger-color); }
+.text-warning { color: var(--warning-color); }
+.text-info { color: var(--info-color); }
+.text-success { color: var(--success-color); }
+.text-muted { color: var(--text-muted); }
+
+/* Utility классы для фонов */
+.bg-primary { background-color: var(--primary-color); color: var(--text-light); }
+.bg-secondary { background-color: var(--secondary-color); color: var(--text-light); }
+.bg-danger { background-color: var(--danger-color); color: var(--text-light); }
+.bg-warning { background-color: var(--warning-color); color: var(--text-light); }
+.bg-info { background-color: var(--info-color); color: var(--text-light); }
+.bg-success { background-color: var(--success-color); color: var(--text-light); }

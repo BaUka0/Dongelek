@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dongelek - Автокөлік сату және сатып алу сайты{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/index.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-content">
+            <h1 class="hero-title">Автокөлік платформасына қош келдіңіз</h1>
+            <p class="hero-subtitle">Сенімді автокөліктерді сату және сатып алу</p>
+            <div class="hero-buttons">
+                <a href="{% url 'catalog' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-search"></i> Автокөлік табу
+                </a>
+                {% if user.is_authenticated %}
+                    {% if user.is_seller %}
+                        <a href="{% url 'car_create' %}" class="btn btn-outline btn-lg">
+                            <i class="fas fa-plus-circle"></i> Жарнама қосу
+                        </a>
+                    {% else %}
+                        <a href="{% url 'become_seller' %}" class="btn btn-outline btn-lg">
+                            <i class="fas fa-store"></i> Сатушы болу
+                        </a>
+                    {% endif %}
+                {% else %}
+                    <a href="{% url 'signup' %}" class="btn btn-outline btn-lg">
+                        <i class="fas fa-user-plus"></i> Тіркелу
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Listings -->
+<section class="featured-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Ұсынылған автокөліктер</h2>
+            <a href="{% url 'catalog' %}" class="btn btn-outline">
+                <i class="fas fa-list"></i> Барлығын көру
+            </a>
+        </div>
+        
+        <div class="cars-container">
+            {% for car in cars %}
+            <div class="car-item">
+                <div class="car-image">
+                    <a href="{{ car.get_absolute_url }}">
+                        <img src="{{ car.image.url }}" alt="{{ car }}">
+                    </a>
+                    <div class="car-price">{{ car.price_display }}</div>
+                </div>
+                <div class="car-info">
+                    <h3 class="car-title">
+                        <a href="{{ car.get_absolute_url }}">{{ car }}</a>
+                    </h3>
+                    <div class="car-meta">
+                        <span class="car-year"><i class="fas fa-calendar-alt"></i> {{ car.year }} ж.</span>
+                        <span class="car-mileage"><i class="fas fa-tachometer-alt"></i> {{ car.mileage }} км</span>
+                    </div>
+                    <p class="car-seller">
+                        <i class="fas fa-user"></i> {{ car.seller.username }}
+                    </p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="how-it-works">
+    <div class="container">
+        <h2 class="section-title text-center">Қалай жұмыс істейді?</h2>
+        
+        <div class="steps-container">
+            <div class="step-item">
+                <div class="step-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3 class="step-title">Іздеу және табу</h3>
+                <p class="step-description">
+                    Біздің каталогтан өз параметрлеріңізге сәйкес келетін автокөлікті табыңыз
+                </p>
+            </div>
+            
+            <div class="step-item">
+                <div class="step-icon">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <h3 class="step-title">Байланысу</h3>
+                <p class="step-description">
+                    Автокөлік иесімен тікелей байланысып, кездесу ұйымдастырыңыз
+                </p>
+            </div>
+            
+            <div class="step-item">
+                <div class="step-icon">
+                    <i class="fas fa-handshake"></i>
+                </div>
+                <h3 class="step-title">Келісім жасау</h3>
+                <p class="step-description">
+                    Автокөлікті тексеріп, келісім жасаңыз және документтерді рәсімдеңіз
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <h2 class="cta-title">Автокөлігіңізді жылдам сатқыңыз келе ме?</h2>
+            <p class="cta-text">
+                Тіркеліп, автокөлігіңізді миллиондаған потенциалды сатып алушыларға көрсетіңіз. 
+                Біздің платформа - автокөлік нарығындағы сенімді серіктес.
+            </p>
+            <div class="cta-buttons">
+                {% if user.is_authenticated %}
+                    {% if user.is_seller %}
+                        <a href="{% url 'car_create' %}" class="btn btn-light btn-lg">
+                            <i class="fas fa-plus-circle"></i> Автокөлікті сатуға қою
+                        </a>
+                    {% else %}
+                        <a href="{% url 'become_seller' %}" class="btn btn-light btn-lg">
+                            <i class="fas fa-store"></i> Сатушы болу
+                        </a>
+                    {% endif %}
+                {% else %}
+                    <a href="{% url 'signup' %}" class="btn btn-light btn-lg">
+                        <i class="fas fa-user-plus"></i> Тіркелу
+                    </a>
+                    <a href="{% url 'login' %}" class="btn btn-outline btn-lg btn-light-outline">
+                        <i class="fas fa-sign-in-alt"></i> Кіру
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+{% if page_obj.has_other_pages %}
+    {% include 'pagination.html' %}
+{% endif %}
+
+{% endblock %}

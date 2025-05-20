@@ -1,0 +1,559 @@
+{% extends 'base.html' %}
+
+{% block title %}Dongelek - Тіркелу{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="auth-container">
+        <div class="auth-header">
+            <h1 class="auth-title">Жаңа аккаунт құру</h1>
+            <p class="auth-subtitle">Dongelek-ке тіркеліп, жариялаулар жасаңыз</p>
+        </div>
+        
+        <form method="post" enctype="multipart/form-data" class="auth-form">
+            {% csrf_token %}
+            
+            {% for field in form %}
+                {% if field.errors %}
+                    <div class="auth-error">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <div>
+                            {% for error in field.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <div class="form-group">
+                    <div class="form-label-container">
+                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                        {% if field.help_text %}
+                            <div class="tooltip-container">
+                                <i class="fas fa-question-circle help-icon"></i>
+                                <div class="tooltip-content">{{ field.help_text|safe }}</div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if field.name == 'username' %}
+                        <div class="form-input-group">
+                            <div class="input-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            {{ field }}
+                        </div>
+                    {% elif field.name == 'email' %}
+                        <div class="form-input-group">
+                            <div class="input-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            {{ field }}
+                        </div>
+                    {% elif 'password' in field.name %}
+                        <div class="form-input-group">
+                            <div class="input-icon">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            {{ field }}
+                        </div>
+                    {% elif field.name == 'avatar' %}
+                        <div class="avatar-upload-section">
+                            <div id="avatar-preview-container" class="avatar-preview-container" style="display: none;">
+                                <img id="avatar-preview" class="avatar-preview" src="" alt="Preview">
+                            </div>
+                            <div class="avatar-placeholder" id="avatar-placeholder">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="avatar-dropzone" id="avatar-dropzone">
+                                <i class="fas fa-cloud-upload-alt dropzone-icon"></i>
+                                <p class="dropzone-text">Аватарды осында сүйреңіз<br>немесе</p>
+                                <button type="button" class="btn btn-outline avatar-select-btn">
+                                    <i class="fas fa-image"></i> Аватар таңдау
+                                </button>
+                            </div>
+                            {{ field }}
+                        </div>
+                    {% elif field.name == 'bio' %}
+                        {{ field }}
+                    {% else %}
+                        {{ field }}
+                    {% endif %}
+                </div>
+            {% endfor %}
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-user-plus"></i> Тіркелу
+                </button>
+            </div>
+        </form>
+        
+        <div class="auth-links">
+            <span>Аккаунтыңыз бар ма?</span>
+            <a href="{% url 'login' %}" class="auth-link">
+                <i class="fas fa-sign-in-alt"></i> Кіру
+            </a>
+        </div>
+    </div>
+</section>
+
+<style>
+    /* Improved container width for desktop */
+    .auth-container {
+        width: 100%;
+        max-width: 650px;
+        margin: 0 auto;
+        padding: 2.5rem;
+        background-color: var(--card-bg);
+        border-radius: 1rem;
+        box-shadow: var(--shadow-lg);
+        border: 1px solid var(--border-color);
+    }
+    
+    /* Form layout improvements */
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+    
+    .form-label-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.35rem;
+    }
+    
+    /* More compact inputs */
+    .form-input-group {
+        margin-bottom: 0.5rem;
+    }
+    
+    input:not([type="file"]), textarea {
+        background-color: var(--input-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+    }
+    
+    /* Better field spacing */
+    .auth-form {
+        padding: 0.5rem;
+        margin-top: 1rem;
+    }
+    
+    /* Modern tooltip style */
+    .tooltip-container {
+        position: relative;
+        display: inline-block;
+    }
+    
+    .help-icon {
+        color: var(--text-muted);
+        cursor: pointer;
+        font-size: 0.875rem;
+        transition: color 0.2s ease;
+    }
+    
+    .help-icon:hover {
+        color: var(--primary-color);
+    }
+    
+    .tooltip-content {
+        visibility: hidden;
+        position: absolute;
+        width: 250px;
+        background-color: var(--card-bg);
+        color: var(--text-color);
+        text-align: left;
+        border-radius: 0.5rem;
+        padding: 0.75rem;
+        z-index: 100;
+        box-shadow: var(--shadow-md);
+        right: 0;
+        top: 100%;
+        margin-top: 0.5rem;
+        font-size: 0.75rem;
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: opacity 0.3s, transform 0.3s;
+        pointer-events: none;
+        border: 1px solid var(--border-color);
+    }
+    
+    .tooltip-container:hover .tooltip-content {
+        visibility: visible;
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .file-upload-container {
+        margin-top: 0.5rem;
+    }
+    
+    .file-upload-label {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        background-color: var(--hover-bg);
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.875rem;
+        color: var(--text-color);
+    }
+    
+    .file-upload-label:hover {
+        background-color: var(--border-color);
+    }
+    
+    .file-upload-label i {
+        margin-right: 0.5rem;
+    }
+    
+    input[type="file"] {
+        position: absolute;
+        width: 0.1px;
+        height: 0.1px;
+        opacity: 0;
+        overflow: hidden;
+        z-index: -1;
+    }
+    
+    .file-name {
+        display: inline-block;
+        margin-left: 0.75rem;
+        font-size: 0.875rem;
+        color: var(--text-muted);
+    }
+    
+    /* Modern avatar upload styles */
+    .avatar-upload-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0.75rem 0;
+        gap: 1rem;
+    }
+    
+    .avatar-preview-container {
+        margin: 0 auto;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+    
+    .avatar-preview {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid var(--primary-color);
+        box-shadow: var(--shadow);
+    }
+    
+    .avatar-placeholder {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto;
+        background-color: var(--hover-bg);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: var(--text-muted);
+    }
+    
+    .avatar-dropzone {
+        width: 100%;
+        max-width: 350px;
+        border: 2px dashed var(--border-color);
+        border-radius: 0.75rem;
+        padding: 1.25rem 1rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background-color: var(--card-bg);
+    }
+    
+    .avatar-dropzone:hover {
+        border-color: var(--primary-color);
+        background-color: var(--hover-bg);
+    }
+    
+    .dropzone-icon {
+        font-size: 2rem;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+    }
+    
+    .dropzone-text {
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+    }
+    
+    .avatar-select-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .btn-outline {
+        background-color: transparent;
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+        transition: all 0.3s ease;
+    }
+    
+    .btn-outline:hover {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+        background-color: var(--hover-bg);
+    }
+    
+    .avatar-dropzone.dragover {
+        border-color: var(--primary-color);
+        background-color: var(--hover-bg);
+    }
+    
+    /* Improved responsive design */
+    @media (min-width: 1024px) {
+        .auth-container {
+            max-width: 800px;
+            padding: 2.5rem 3rem;
+        }
+        
+        .auth-form {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            column-gap: 2rem;
+            row-gap: 0.75rem;
+        }
+        
+        .auth-form .form-group {
+            margin-bottom: 0.75rem;
+        }
+        
+        /* Full-width elements */
+        .auth-form .form-group:has(textarea),
+        .auth-form .form-group:has(.avatar-upload-section),
+        .auth-form .auth-error,
+        .auth-form .form-actions {
+            grid-column: 1 / -1;
+        }
+        
+        /* More balanced layout */
+        .avatar-upload-section {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            align-items: center;
+            gap: 1.5rem;
+            margin: 1rem 0 0.5rem;
+        }
+        
+        .avatar-preview-container, 
+        .avatar-placeholder {
+            grid-row: span 2;
+        }
+    }
+    
+    @media (min-width: 768px) and (max-width: 1023px) {
+        .auth-container {
+            max-width: 650px;
+            padding: 2rem;
+        }
+        
+        .avatar-preview, .avatar-placeholder {
+            width: 130px;
+            height: 130px;
+        }
+        
+        /* Better spacing for tablet view */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+    }
+    
+    @media (max-width: 767px) {
+        .auth-container {
+            padding: 1.5rem;
+            max-width: 100%;
+        }
+        
+        .avatar-upload-section {
+            margin: 0.5rem 0;
+        }
+        
+        .avatar-preview, .avatar-placeholder {
+            width: 100px;
+            height: 100px;
+            font-size: 2.5rem;
+        }
+        
+        .tooltip-content {
+            width: 200px;
+        }
+    }
+    
+    /* Additional visual improvements */
+    .auth-title {
+        font-size: 1.75rem;
+        margin-bottom: 0.5rem;
+        color: var(--heading-color);
+    }
+    
+    .auth-subtitle {
+        margin-bottom: 1.25rem;
+        opacity: 0.9;
+        color: var(--text-color);
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get DOM elements
+        const fileInput = document.querySelector('input[type="file"]');
+        const dropzone = document.getElementById('avatar-dropzone');
+        const avatarPlaceholder = document.getElementById('avatar-placeholder');
+        const previewContainer = document.getElementById('avatar-preview-container');
+        const previewImg = document.getElementById('avatar-preview');
+        const avatarSelectBtn = document.querySelector('.avatar-select-btn');
+        
+        // Handle file selection
+        fileInput.addEventListener('change', function() {
+            if (this.files && this.files.length > 0) {
+                const file = this.files[0];
+                
+                // Check if file is an image
+                if (!file.type.match('image.*')) {
+                    alert('Тек қана сурет файлдарын таңдаңыз.');
+                    return;
+                }
+                
+                // Check file size (max 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Файл өлшемі 5MB аспауы керек.');
+                    return;
+                }
+                
+                // Show preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Hide placeholder
+                    if (avatarPlaceholder) avatarPlaceholder.style.display = 'none';
+                    
+                    // Show preview
+                    previewImg.src = e.target.result;
+                    previewContainer.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // Open file dialog when clicking the select button
+        if (avatarSelectBtn) {
+            avatarSelectBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                fileInput.click();
+            });
+        }
+        
+        // Handle drag and drop
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropzone.addEventListener(eventName, highlight, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, unhighlight, false);
+        });
+        
+        function highlight() {
+            dropzone.classList.add('dragover');
+        }
+        
+        function unhighlight() {
+            dropzone.classList.remove('dragover');
+        }
+        
+        dropzone.addEventListener('drop', handleDrop, false);
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            
+            if (files.length > 0) {
+                fileInput.files = files;
+                const event = new Event('change');
+                fileInput.dispatchEvent(event);
+            }
+        }
+        
+        // Check if dark mode is active and apply appropriate styles
+        function applyThemeStyles() {
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            
+            if (avatarPlaceholder) {
+                avatarPlaceholder.style.backgroundColor = isDarkMode ? '#1e293b' : '#f1f5f9';
+                avatarPlaceholder.style.color = isDarkMode ? '#64748b' : '#94a3b8';
+            }
+            
+            if (dropzone) {
+                dropzone.style.backgroundColor = isDarkMode ? '#0f172a' : '#f8fafc';
+                dropzone.style.borderColor = isDarkMode ? '#334155' : '#cbd5e1';
+            }
+            
+            // Update other elements that need theme-specific styling
+            const tooltipContents = document.querySelectorAll('.tooltip-content');
+            tooltipContents.forEach(tooltip => {
+                tooltip.style.backgroundColor = isDarkMode ? '#1e293b' : '#fff';
+                tooltip.style.color = isDarkMode ? '#e2e8f0' : '#334155';
+                tooltip.style.borderColor = isDarkMode ? '#334155' : '#e5e7eb';
+            });
+            
+            // Update text colors
+            const authTitle = document.querySelector('.auth-title');
+            if (authTitle) {
+                authTitle.style.color = isDarkMode ? 'var(--heading-color)' : '';
+            }
+            
+            const authSubtitle = document.querySelector('.auth-subtitle');
+            if (authSubtitle) {
+                authSubtitle.style.color = isDarkMode ? 'var(--text-color)' : '';
+            }
+            
+            const dropzoneText = document.querySelector('.dropzone-text');
+            if (dropzoneText) {
+                dropzoneText.style.color = isDarkMode ? 'var(--text-muted)' : '';
+            }
+            
+            // Update form elements
+            const formLabels = document.querySelectorAll('.form-label');
+            formLabels.forEach(label => {
+                label.style.color = isDarkMode ? 'var(--text-color)' : '';
+            });
+            
+            const inputs = document.querySelectorAll('input:not([type="file"]), textarea');
+            inputs.forEach(input => {
+                input.style.backgroundColor = isDarkMode ? 'var(--input-bg)' : '';
+                input.style.color = isDarkMode ? 'var(--text-color)' : '';
+                input.style.borderColor = isDarkMode ? 'var(--border-color)' : '';
+            });
+        }
+        
+        // Initial application of theme styles
+        applyThemeStyles();
+        
+        // Listen for theme changes
+        document.addEventListener('themeChanged', function(event) {
+            applyThemeStyles();
+        });
+    });
+</script>
+{% endblock %}

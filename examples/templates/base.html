@@ -1,0 +1,194 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="kz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dongelek - Автокөлік сайты{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/search_catalog.css' %}">
+    <link rel="stylesheet" href="{% static 'css/chatbot.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-inner">
+                <div class="logo">
+                    <a href="{% url 'index' %}">
+                        <i class="fas fa-car-side logo-icon"></i>
+                        <span class="logo-text">Dongelek</span>
+                    </a>
+                </div>
+                
+                <nav class="main-nav">
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a href="{% url 'index' %}" class="nav-link">
+                                <i class="fas fa-home"></i> Басты бет
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'catalog' %}" class="nav-link">
+                                <i class="fas fa-car"></i> Каталог
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'car_search' %}" class="nav-link">
+                                <i class="fas fa-search"></i> Іздеу
+                            </a>
+                        </li>
+                        {% if user.is_authenticated and user.is_seller %}
+                            <li class="nav-item">
+                                <a href="{% url 'seller_dashboard' %}" class="nav-link">
+                                    <i class="fas fa-tachometer-alt"></i> Менің жарнамаларым
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'car_create' %}" class="nav-link">
+                                    <i class="fas fa-plus-circle"></i> Жариялау қосу
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                
+                <div class="header-actions">
+                    <button id="theme-toggle" class="btn-icon" aria-label="Тақырыпты ауыстыру">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    
+                    {% if user.is_authenticated %}
+                        <div class="user-dropdown">
+                            <button class="user-dropdown-toggle">
+                                <img src="{{ user.avatar.url }}" alt="{{ user.username }}" class="user-avatar">
+                                <span class="user-name">{{ user.username }}</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="user-dropdown-menu">
+                                <a href="{% url 'profile_update' %}" class="dropdown-item">
+                                    <i class="fas fa-user-edit"></i> Профиль
+                                </a>
+                                {% if user.is_seller %}
+                                    <a href="{% url 'seller_dashboard' %}" class="dropdown-item">
+                                        <i class="fas fa-tachometer-alt"></i> Менің жарнамаларым
+                                    </a>
+                                    <a href="{% url 'car_create' %}" class="dropdown-item">
+                                        <i class="fas fa-plus-circle"></i> Жариялау қосу
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'become_seller' %}" class="dropdown-item">
+                                        <i class="fas fa-store"></i> Сатушы болу
+                                    </a>
+                                    {% if user.seller_applications.exists %}
+                                        <a href="{% url 'application_status' %}" class="dropdown-item">
+                                            <i class="fas fa-clipboard-check"></i> Өтініш мәртебесі
+                                        </a>
+                                    {% endif %}
+                                {% endif %}
+                                <form method="post" action="{% url 'logout' %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="dropdown-item dropdown-item-button">
+                                        <i class="fas fa-sign-out-alt"></i> Шығу
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="auth-buttons">
+                            <a href="{% url 'login' %}" class="btn btn-outline">
+                                <i class="fas fa-sign-in-alt"></i> Кіру
+                            </a>
+                            <a href="{% url 'signup' %}" class="btn btn-primary">
+                                <i class="fas fa-user-plus"></i> Тіркелу
+                            </a>
+                        </div>
+                    {% endif %}
+                    
+                    <button class="mobile-menu-toggle" aria-label="Мәзірді көрсету">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        {% if messages %}
+            <div class="messages-container">
+                <div class="container">
+                    <div class="messages">
+                        {% for message in messages %}
+                            <div class="message message-{{ message.tags }}">
+                                <div class="message-content">
+                                    {% if message.tags == 'success' %}
+                                        <i class="fas fa-check-circle message-icon"></i>
+                                    {% elif message.tags == 'error' %}
+                                        <i class="fas fa-times-circle message-icon"></i>
+                                    {% elif message.tags == 'warning' %}
+                                        <i class="fas fa-exclamation-triangle message-icon"></i>
+                                    {% else %}
+                                        <i class="fas fa-info-circle message-icon"></i>
+                                    {% endif %}
+                                    <span>{{ message }}</span>
+                                </div>
+                                <button class="message-close">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <i class="fas fa-car-side logo-icon"></i>
+                    <span class="logo-text">Dongelek</span>
+                </div>
+                
+                <div class="footer-info">
+                    <p>&copy; {% now "Y" %} Dongelek - Автокөлік сайты. Барлық құқықтар қорғалған.</p>
+                </div>
+                
+                <div class="footer-social">
+                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-telegram"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Chatbot -->
+    {% if user.is_authenticated %}
+        <button class="chatbot-fab" id="chatbot-toggle-button" title="Чатты ашу">
+            <i class="far fa-comment-dots"></i>
+        </button>
+        {% include 'chatbot/chat_widget.html' %}
+    {% endif %}
+
+    <!-- Scripts -->
+    {% block extra_js_before %}{% endblock %}
+    <script src="{% static 'js/theme.js' %}"></script>
+    <script src="{% static 'js/chatbot.js' %}" defer></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
