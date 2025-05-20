@@ -1,19 +1,23 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.urls import reverse_lazy, reverse
+from django.urls import reverse_lazy, reverse, NoReverseMatch
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import (
-    ListView, DetailView, CreateView, UpdateView, DeleteView
+    ListView, DetailView, CreateView, UpdateView, DeleteView, FormView
 )
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from django.db.models import Q
+from django.db.models import Q, Avg
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from .models import (
     Car, CarImage, Favorite, Brand, CarModel, City, Region,
-    CompareList, CompareItem
+    CompareList, CompareItem, SellerReview
 )
-from .forms import CarForm, CarImageFormSet
+from .forms import CarForm, CarImageFormSet, SellerReviewForm
+
+# Get the user model
+User = get_user_model()
 
 
 class CarListView(ListView):
@@ -123,10 +127,21 @@ class CarDetailView(DetailView):
             context['is_favorite'] = Favorite.objects.filter(
                 user=self.request.user, car=self.object
             ).exists()
+            # Check if user has already reviewed this seller
+            context['user_review'] = SellerReview.objects.filter(
+                reviewer=self.request.user, seller=self.object.seller
+            ).first()
         # Add similar cars
         context['similar_cars'] = Car.objects.filter(
             brand=self.object.brand, is_active=True
         ).exclude(id=self.object.id)[:4]
+        
+        # Add seller rating information
+        seller = self.object.seller
+        context['seller_reviews'] = SellerReview.objects.filter(seller=seller).order_by('-created_at')
+        context['seller_review_form'] = SellerReviewForm()
+        context['avg_seller_rating'] = SellerReview.objects.filter(seller=seller).aggregate(Avg('rating'))['rating__avg']
+        context['seller_review_count'] = SellerReview.objects.filter(seller=seller).count()
         return context
 
 
@@ -448,3 +463,126 @@ def compare_list(request):
         return render(request, 'cars/compare_list.html', {'cars': cars})
     
     return render(request, 'cars/compare_list.html', {'cars': cars})
+
+
+@login_required
+def add_seller_review(request, seller_id):
+    seller = get_object_or_404(User, id=seller_id)
+    
+    # Check if the user is not trying to review themselves
+    if seller == request.user:
+        messages.error(request, "You cannot review yourself.")
+        # Try different possible URL names or use a safe fallback
+        try:
+            return redirect('user_profile', username=seller.username)
+        except NoReverseMatch:
+            try:
+                return redirect('accounts:profile_detail', username=seller.username)
+            except NoReverseMatch:
+                # If no profile view is available, redirect to home
+                return redirect('home')
+    
+    # Check if user has already reviewed this seller
+    existing_review = SellerReview.objects.filter(reviewer=request.user, seller=seller).first()
+    
+    # Get the optional car_id if provided
+    car_id = request.POST.get('car_id')
+    car = None
+    if car_id:
+        try:
+            car = Car.objects.get(id=car_id, seller=seller)
+        except Car.DoesNotExist:
+            pass
+    
+    if request.method == 'POST':
+        form = SellerReviewForm(request.POST, instance=existing_review)
+        if form.is_valid():
+            review = form.save(commit=False)
+            if not existing_review:
+                review.reviewer = request.user
+                review.seller = seller
+                review.car = car
+                
+                # Check if user has interacted with the seller (e.g., sent a message)
+                if hasattr(request.user, 'conversations'):
+                    if request.user.conversations.filter(participants=seller).exists():
+                        review.is_verified = True
+            
+            review.save()
+            
+            if existing_review:
+                messages.success(request, "Your review has been updated.")
+            else:
+                messages.success(request, "Your review has been submitted.")
+            
+            # Redirect back to where the review was submitted from
+            next_url = request.POST.get('next', '')
+            if next_url:
+                return redirect(next_url)
+            else:
+                # Try different possible URL names or use a safe fallback
+                try:
+                    return redirect('user_profile', username=seller.username)
+                except NoReverseMatch:
+                    # If profile view not found, redirect to car detail or home
+                    if car:
+                        return redirect('car_detail', slug=car.slug)
+                    else:
+                        return redirect('home')
+        else:
+            for error in form.errors.values():
+                messages.error(request, error)
+    
+    # If GET request or form invalid, redirect back
+    if request.META.get('HTTP_REFERER'):
+        return redirect(request.META.get('HTTP_REFERER'))
+    else:
+        # Simple fallback if no referrer
+        if car:
+            return redirect('car_detail', slug=car.slug)
+        else:
+            return redirect('home')
+
+
+@login_required
+def delete_seller_review(request, review_id):
+    review = get_object_or_404(SellerReview, id=review_id)
+    
+    # Check if the user is the owner of the review
+    if review.reviewer != request.user:
+        messages.error(request, "You cannot delete someone else's review.")
+        # Try different possible URL names or use a safe fallback
+        try:
+            return redirect('user_profile', username=review.seller.username)
+        except NoReverseMatch:
+            if hasattr(review, 'car') and review.car:
+                return redirect('car_detail', slug=review.car.slug)
+            else:
+                return redirect('home')
+    
+    if request.method == 'POST':
+        seller_username = review.seller.username
+        # Save car reference before deleting review
+        car = review.car
+        review.delete()
+        messages.success(request, "Your review has been deleted.")
+        
+        # Redirect back to where the review was deleted from
+        next_url = request.POST.get('next', '')
+        if next_url:
+            return redirect(next_url)
+        else:
+            # Try different possible URL names or use a safe fallback
+            try:
+                return redirect('user_profile', username=seller_username)
+            except NoReverseMatch:
+                if car:
+                    return redirect('car_detail', slug=car.slug)
+                else:
+                    return redirect('home')
+    
+    context = {
+        'review': review,
+        'next': request.GET.get('next', '')
+    }
+    return render(request, 'cars/seller_review_confirm_delete.html', context)

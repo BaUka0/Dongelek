@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import (
-    Brand, CarModel, Car, CarImage, Favorite, Region, City, CompareList, CompareItem
+    Brand, CarModel, Car, CarImage, Favorite, Region, City, 
+    CompareList, CompareItem, SellerReview
 )
 
 
@@ -111,3 +112,23 @@ class CompareItemAdmin(admin.ModelAdmin):
     search_fields = ('compare_list__user__email', 'car__brand__name', 'car__model__name')
     autocomplete_fields = ['car', 'compare_list']
     readonly_fields = ('added_at',)
+
+
+@admin.register(SellerReview)
+class SellerReviewAdmin(admin.ModelAdmin):
+    list_display = ('reviewer', 'seller', 'rating', 'is_verified', 'created_at')
+    list_filter = ('rating', 'is_verified', 'created_at')
+    search_fields = ('reviewer__username', 'seller__username', 'comment')
+    readonly_fields = ('created_at', 'updated_at')
+    fieldsets = (
+        ('Review Information', {
+            'fields': ('reviewer', 'seller', 'car', 'rating', 'comment')
+        }),
+        ('Verification', {
+            'fields': ('is_verified',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )

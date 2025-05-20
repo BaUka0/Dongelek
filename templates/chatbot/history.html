@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+
+{% block title %}Chat History - Dongelek{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Your Chat History</h1>
+        {% if user_sessions %}
+        <div>
+            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#clearHistoryModal">
+                <i class="fas fa-trash"></i> Clear All History
+            </button>
+        </div>
+        {% endif %}
+    </div>
+    
+    {% if user_sessions %}
+        <div class="row">
+            <div class="col-md-4">
+                <div class="list-group mb-4">
+                    {% for session in user_sessions %}
+                    <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <a href="#session-{{ session.id }}" data-bs-toggle="list" class="flex-grow-1 text-decoration-none text-dark">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Session {{ forloop.counter }}</h6>
+                                <small>{{ session.created_at|date:"d.m.Y" }}</small>
+                            </div>
+                            <small class="text-muted">{{ session.messages.count }} messages</small>
+                        </a>
+                        <button class="btn btn-sm btn-danger ms-2 delete-session-btn" data-bs-toggle="modal" data-bs-target="#deleteSessionModal" data-session-id="{{ session.session_id }}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="col-md-8">
+                <div class="tab-content">
+                    {% for session in user_sessions %}
+                    <div class="tab-pane fade {% if forloop.first %}show active{% endif %}" id="session-{{ session.id }}">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Session from {{ session.created_at|date:"d.m.Y H:i" }}</h5>
+                                <small class="text-muted">{{ session.messages.count }} messages</small>
+                            </div>
+                            <div class="card-body">
+                                <div class="chatbot-messages history-messages">
+                                    {% for message in session.messages.all %}
+                                    <div class="message user-message">
+                                        <div class="message-content">
+                                            <div class="message-header">
+                                                <small class="text-muted">You - {{ message.created_at|date:"H:i" }}</small>
+                                            </div>
+                                            <p>{{ message.user_message }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="message bot-message">
+                                        <div class="message-content">
+                                            <div class="message-header">
+                                                <small class="text-muted">Dongelek Assistant - {{ message.created_at|date:"H:i" }}</small>
+                                            </div>
+                                            <p>{{ message.bot_response }}</p>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <p>You haven't had any conversations with our chatbot yet.</p>
+            <p>Try asking the chatbot for help by clicking the chat button in the bottom right corner of any page.</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Delete Session Modal -->
+<div class="modal fade" id="deleteSessionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Chat Session</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this chat session? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a href="#" id="delete-session-link" class="btn btn-danger">Delete Session</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Clear All History Modal -->
+<div class="modal fade" id="clearHistoryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Clear All Chat History</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to clear all your chat history? This will delete all of your conversations with the chatbot.</p>
+                <p class="text-danger"><strong>This action cannot be undone.</strong></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a href="{% url 'clear_chat_history' %}" class="btn btn-danger">Clear All History</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .history-messages {
+        max-height: 500px;
+        overflow-y: auto;
+    }
+    
+    .message {
+        margin-bottom: 15px;
+    }
+    
+    .message-content {
+        padding: 10px 15px;
+        border-radius: 10px;
+        max-width: 80%;
+    }
+    
+    .user-message {
+        display: flex;
+        justify-content: flex-end;
+    }
+    
+    .user-message .message-content {
+        background-color: #e9f0ff;
+    }
+    
+    .bot-message .message-content {
+        background-color: #f1f1f1;
+    }
+    
+    .message-header {
+        margin-bottom: 5px;
+    }
+    
+    .delete-session-btn {
+        opacity: 0.4;
+        transition: opacity 0.2s;
+    }
+    
+    .list-group-item:hover .delete-session-btn {
+        opacity: 1;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Populate the delete session modal with correct link
+        $('.delete-session-btn').click(function() {
+            const sessionId = $(this).data('session-id');
+            $('#delete-session-link').attr('href', "{% url 'delete_chat_session' 'SESSION_ID' %}".replace('SESSION_ID', sessionId));
+        });
+    });
+</script>
+{% endblock %}

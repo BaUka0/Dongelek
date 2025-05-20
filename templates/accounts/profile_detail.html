@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Review - Dongelek{% endblock %}
+
+{% block content %}
+<div class="card mt-4" id="reviews">
+    <div class="card-header">
+        <h5 class="mb-0">Seller Reviews</h5>
+    </div>
+    <div class="card-body">
+        {% if seller_reviews %}
+            <div class="d-flex align-items-center mb-3">
+                <div class="me-2">
+                    {% for i in "12345" %}
+                        {% if forloop.counter <= avg_seller_rating|floatformat:"0" %}
+                            <i class="fas fa-star text-warning"></i>
+                        {% elif forloop.counter <= avg_seller_rating|add:"0.5"|floatformat:"0" %}
+                            <i class="fas fa-star-half-alt text-warning"></i>
+                        {% else %}
+                            <i class="far fa-star text-warning"></i>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <span class="fw-bold">{{ avg_seller_rating|floatformat:1 }}</span>
+                <span class="text-muted ms-2">({{ seller_review_count }} reviews)</span>
+            </div>
+            
+            {% if user.is_authenticated and user != profile_user and not user_review %}
+                <div class="mb-4">
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reviewSellerModal">
+                        <i class="fas fa-star me-1"></i> Write a Review
+                    </button>
+                </div>
+            {% endif %}
+            
+            <div class="list-group">
+                {% for review in seller_reviews %}
+                    <div class="list-group-item">
+                        <div class="d-flex align-items-start">
+                            <div class="me-3">
+                                <i class="fas fa-user-circle fa-2x text-secondary"></i>
+                            </div>
+                            <div class="w-100">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">{{ review.reviewer.get_full_name|default:review.reviewer.username }}</h6>
+                                        <div class="mb-2">
+                                            {% for i in "12345" %}
+                                                {% if forloop.counter <= review.rating %}
+                                                    <i class="fas fa-star text-warning"></i>
+                                                {% else %}
+                                                    <i class="far fa-star text-warning"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                            {% if review.is_verified %}
+                                                <span class="badge bg-success ms-2">Verified</span>
+                                            {% endif %}
+                                            {% if review.car %}
+                                                <small class="text-muted ms-2">
+                                                    <i class="fas fa-car"></i> 
+                                                    <a href="{{ review.car.get_absolute_url }}" class="text-decoration-none">
+                                                        {{ review.car.brand }} {{ review.car.model }}
+                                                    </a>
+                                                </small>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">{{ review.created_at|date:"F d, Y" }}
+                                        {% if review.is_edited %}
+                                        (edited)
+                                        {% endif %}
+                                    </small>
+                                </div>
+                                <p class="mb-0">{{ review.comment }}</p>
+                                
+                                {% if user == review.reviewer %}
+                                <div class="mt-2 text-end">
+                                    <button class="btn btn-sm btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#editReviewModal{{ review.id }}">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    <a href="{% url 'delete_seller_review' review.id %}?next={{ request.path|urlencode }}#reviews" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if user == review.reviewer %}
+                    <!-- Edit Review Modal for each review -->
+                    <div class="modal fade" id="editReviewModal{{ review.id }}" tabindex="-1" aria-labelledby="editReviewModalLabel{{ review.id }}" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="editReviewModalLabel{{ review.id }}">Edit Your Review</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form method="post" action="{% url 'add_seller_review' profile_user.id %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="next" value="{{ request.path }}#reviews">
+                                        
+                                        <div class="mb-3">
+                                            <label for="id_rating_{{ review.id }}" class="form-label">Rating</label>
+                                            <select name="rating" id="id_rating_{{ review.id }}" class="form-select" required>
+                                                {% for value, text in seller_review_form.fields.rating.choices %}
+                                                    <option value="{{ value }}" {% if review.rating == value %}selected{% endif %}>{{ text }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="id_comment_{{ review.id }}" class="form-label">Comment</label>
+                                            <textarea name="comment" id="id_comment_{{ review.id }}" class="form-control" rows="4" required>{{ review.comment }}</textarea>
+                                        </div>
+                                        
+                                        <div class="d-flex justify-content-between">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <button type="submit" class="btn btn-primary">Update Review</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-4">
+                <p>No reviews yet for this seller.</p>
+                {% if user.is_authenticated and user != profile_user %}
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reviewSellerModal">
+                        <i class="fas fa-star me-1"></i> Be the first to review
+                    </button>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Review Seller Modal -->
+{% if user.is_authenticated and user != profile_user %}
+<div class="modal fade" id="reviewSellerModal" tabindex="-1" aria-labelledby="reviewSellerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reviewSellerModalLabel">Rate & Review Seller</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {% if user_review %}
+                    <div class="alert alert-info">
+                        <strong>You've already reviewed this seller.</strong> You can update your review below.
+                    </div>
+                {% endif %}
+                
+                <form method="post" action="{% url 'add_seller_review' profile_user.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.path }}#reviews">
+                    
+                    <div class="mb-3">
+                        <label for="id_rating_new" class="form-label">Rating</label>
+                        <select name="rating" id="id_rating_new" class="form-select" required>
+                            {% for value, text in seller_review_form.fields.rating.choices %}
+                                <option value="{{ value }}" {% if user_review and user_review.rating == value %}selected{% endif %}>{{ text }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_comment_new" class="form-label">Comment</label>
+                        <textarea name="comment" id="id_comment_new" class="form-control" rows="4" placeholder="Share your experience with this seller..." required>{% if user_review %}{{ user_review.comment }}{% endif %}</textarea>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            {% if user_review %}Update{% else %}Submit{% endif %} Review
+                        </button>
+                    </div>
+                    
+                    {% if user_review %}
+                    <hr>
+                    <div class="text-end">
+                        <a href="{% url 'delete_seller_review' user_review.id %}?next={{ request.path|urlencode }}#reviews" class="btn btn-sm btn-outline-danger">
+                            <i class="fas fa-trash-alt"></i> Delete Review
+                        </a>
+                    </div>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

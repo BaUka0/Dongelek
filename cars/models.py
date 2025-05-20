@@ -241,3 +241,63 @@ class CompareItem(models.Model):
 
     def __str__(self):
         return f"{self.car.brand} {self.car.model} in {self.compare_list}"
+
+class SellerReview(models.Model):
+    RATING_CHOICES = [
+        (1, '1 - Poor'),
+        (2, '2 - Fair'),
+        (3, '3 - Good'),
+        (4, '4 - Very Good'),
+        (5, '5 - Excellent'),
+    ]
+    
+    reviewer = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='reviews_given',
+        verbose_name=_("Reviewer")
+    )
+    seller = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='reviews_received',
+        verbose_name=_("Seller")
+    )
+    car = models.ForeignKey(
+        Car,
+        on_delete=models.SET_NULL,
+        related_name='sale_reviews',
+        verbose_name=_("Related Car"),
+        null=True,
+        blank=True,
+        help_text=_("The car this review is related to (optional)")
+    )
+    rating = models.PositiveSmallIntegerField(
+        choices=RATING_CHOICES,
+        verbose_name=_("Rating")
+    )
+    comment = models.TextField(
+        verbose_name=_("Comment")
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_verified = models.BooleanField(
+        default=False,
+        verbose_name=_("Is Verified"),
+        help_text=_("Indicates if the reviewer has actually conducted a transaction with the seller")
+    )
+    
+    class Meta:
+        verbose_name = _("Seller Review")
+        verbose_name_plural = _("Seller Reviews")
+        ordering = ['-created_at']
+        # Ensure a user can only review a specific seller once
+        unique_together = ('reviewer', 'seller')
+    
+    def __str__(self):
+        return f"Review by {self.reviewer} for {self.seller} - {self.get_rating_display()}"
+    
+    @property
+    def is_edited(self):
+        """Return True if the review has been edited"""
+        return self.created_at != self.updated_at
