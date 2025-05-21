@@ -475,15 +475,12 @@
         </div>
     </nav>
 
+    <!-- Toast notification container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1080;">
+        <!-- Toasts will be dynamically added here -->
+    </div>
+
     <main class="container py-4">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
 
         {% block content %}{% endblock %}
     </main>
@@ -494,21 +491,6 @@
                 <div class="col-md-6">
                     <h5>Dongelek Car Marketplace</h5>
                     <p class="text-muted">The best place to buy and sell cars in Kazakhstan</p>
-                </div>
-                <div class="col-md-3">
-                    <h5>Links</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="{% url 'car_list' %}" class="text-decoration-none">Cars</a></li>
-                        <li><a href="#" class="text-decoration-none">About Us</a></li>
-                        <li><a href="#" class="text-decoration-none">Contact</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-3">
-                    <h5>Contact</h5>
-                    <address class="text-muted">
-                        <p>123 Car Street<br>Almaty, Kazakhstan</p>
-                        <p>Email: info@dongelek.kz<br>Phone: +7 777 123 4567</p>
-                    </address>
                 </div>
             </div>
             <hr>
@@ -838,6 +820,9 @@
                             icon: '/static/img/logo.png'
                         });
                     }
+                    
+                    // Show toast notification
+                    showToastNotification(data);
                 }
             }
         };
@@ -864,6 +849,61 @@
             console.log("WebSocket error occurred.");
             // Don't spam the console with error messages
         };
+    }
+    
+    // Function to show toast notifications
+    function showToastNotification(data) {
+        const toastContainer = document.querySelector('.toast-container');
+        
+        // Generate a unique ID for the toast
+        const toastId = 'toast-' + Date.now();
+        
+        // Create the toast element
+        const toast = document.createElement('div');
+        toast.className = 'toast show';
+        toast.id = toastId;
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+        
+        // Create car details text
+        let carDetails = '';
+        if (data.car_details) {
+            carDetails = `<small class="text-muted d-block">Re: ${data.car_details.make} ${data.car_details.model}</small>`;
+        }
+        
+        // Set toast content
+        toast.innerHTML = `
+            <div class="toast-header">
+                <strong class="me-auto">${data.sender_name}</strong>
+                <small class="text-muted">just now</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                <p class="mb-1">${data.message}</p>
+                ${carDetails}
+                <div class="mt-2 pt-2 border-top">
+                    <a href="/chat/conversation/${data.conversation_id}/" class="btn btn-primary btn-sm">View conversation</a>
+                </div>
+            </div>
+        `;
+        
+        // Add the toast to the container
+        toastContainer.appendChild(toast);
+        
+        // Initialize Bootstrap toast
+        const toastInstance = new bootstrap.Toast(toast, {
+            delay: 10000, // Auto-hide after 10 seconds
+            autohide: true
+        });
+        
+        // Auto-remove toast from DOM after it's hidden
+        toast.addEventListener('hidden.bs.toast', function () {
+            toast.remove();
+        });
+        
+        // Show the toast
+        toastInstance.show();
     }
 
     document.addEventListener('DOMContentLoaded', function() {

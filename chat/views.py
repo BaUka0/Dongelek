@@ -126,7 +126,10 @@ def send_message(request, conversation_id):
                 return JsonResponse({
                     'status': 'success',
                     'message_id': message.id,
-                    'timestamp': message.created_at.strftime('%H:%M')
+                    'timestamp': message.created_at.strftime('%H:%M'),
+                    'sender_name': request.user.username,
+                    'conversation_id': conversation.id,
+                    'car_name': f"{conversation.car.make} {conversation.car.model}"
                 })
             
             # Redirect for non-AJAX requests

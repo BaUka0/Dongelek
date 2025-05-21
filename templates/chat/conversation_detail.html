@@ -10,6 +10,7 @@
         overflow-y: auto;
         display: flex;
         flex-direction: column;
+        position: relative; /* Added for positioning of typing indicator */
     }
     .message {
         max-width: 75%;
@@ -41,6 +42,9 @@
         margin-bottom: 10px;
         display: none;
         align-self: flex-start;
+        position: sticky; /* Make it stick to the bottom */
+        bottom: 0;
+        z-index: 10; /* Ensure it's above messages */
     }
     .car-preview {
         border-left: 3px solid #0d6efd;
@@ -76,12 +80,13 @@
                             <p>No messages yet. Start the conversation!</p>
                         </div>
                     {% endfor %}
-
+                    
+                    <!-- Typing indicator moved outside of the message loop -->
                     <div class="typing-indicator" id="typing-indicator">
                         <span>{{ other_user.get_full_name|default:other_user.email }} is typing...</span>
                     </div>
                 </div>
-
+                
                 <div class="p-3 border-top">
                     <form id="message-form" method="post" action="{% url 'send_message' conversation.id %}">
                         {% csrf_token %}
@@ -138,6 +143,7 @@
             else if (data.typing !== undefined && data.user_id !== {{ request.user.id }}) {
                 if (data.typing) {
                     $('#typing-indicator').show();
+                    scrollToBottom(); // Scroll to show typing indicator
                 } else {
                     $('#typing-indicator').hide();
                 }

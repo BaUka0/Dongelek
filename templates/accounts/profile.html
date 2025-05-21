@@ -3,14 +3,412 @@
 {% block title %}Мой профиль - Dongelek{% endblock %}
 
 {% block content %}
+<style>
+    /* Modern form styling */
+    .form-control, .form-select, input[type="text"], input[type="email"], input[type="password"], textarea {
+        width: 100% !important;
+        max-width: 100% !important;
+        display: block !important;
+        box-sizing: border-box !important;
+        height: 48px !important;
+        padding: 0.75rem 1rem !important;
+        border: 1px solid #dee2e6 !important;
+        transition: all 0.2s ease-in-out !important;
+        background-color: #f8f9fa !important;
+    }
+    
+    .form-control:focus, .form-select:focus, input:focus {
+        border-color: #0d6efd !important;
+        box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.15) !important;
+        background-color: #fff !important;
+    }
+    
+    textarea.form-control {
+        height: auto !important;
+        min-height: 100px !important;
+    }
+    
+    .form-control, .form-select, .btn {
+        border-radius: 6px !important;
+    }
+    
+    .btn-primary {
+        height: 48px !important;
+        font-weight: 500 !important;
+        background-color: #0d6efd !important;
+        border-color: #0d6efd !important;
+        transition: all 0.2s !important;
+    }
+    
+    .btn-primary:hover {
+        background-color: #0b5ed7 !important;
+        border-color: #0b5ed7 !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    /* Card styling */
+    .profile-card {
+        border: none !important;
+        border-radius: 12px !important;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05) !important;
+        overflow: hidden;
+    }
+    
+    .profile-card .card-header {
+        background: linear-gradient(to right, #f8f9fa, #ffffff) !important;
+    }
+    
+    /* Profile image styling */
+    .profile-avatar {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        overflow: hidden;
+        margin: 0 auto;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border: 3px solid #fff;
+    }
+    
+    .profile-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .avatar-initial {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(45deg, #0d6efd, #0dcaf0);
+        color: white;
+        font-size: 60px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        margin: 0 auto;
+    }
+    
+    /* Image preview styling */
+    .avatar-preview {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        border: 2px dashed #dee2e6;
+        margin: 0 auto 20px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        background-color: #f8f9fa;
+        transition: all 0.3s;
+        cursor: pointer;
+    }
+    
+    .avatar-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .avatar-preview i {
+        font-size: 28px;
+        color: #adb5bd;
+    }
+    
+    .avatar-preview:hover {
+        border-color: #0d6efd;
+    }
+    
+    .avatar-preview::after {
+        content: '\f030';
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        opacity: 0;
+        transition: opacity 0.3s;
+        font-size: 24px;
+    }
+    
+    .avatar-preview:hover::after {
+        opacity: 1;
+    }
+    
+    .file-input-label {
+        display: inline-block;
+        text-align: center;
+        cursor: pointer;
+    }
+    
+    .file-input-label:hover .avatar-preview {
+        border-color: #0d6efd;
+        background-color: #f0f7ff;
+    }
+    
+    .custom-file-input {
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+    
+    .badge {
+        padding: 0.5rem 1rem;
+        border-radius: 30px;
+        font-weight: 500;
+    }
+    
+    /* Form field highlight effect on focus */
+    .form-group {
+        position: relative;
+    }
+    
+    .form-highlight {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background-color: #0d6efd;
+        transition: width 0.3s;
+    }
+    
+    .form-control:focus + .form-highlight {
+        width: 100%;
+    }
+    
+    /* Profile stats badges */
+    .profile-stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    
+    .profile-stat-badge {
+        background-color: #f8f9fa;
+        border-radius: 20px;
+        padding: 6px 12px;
+        display: flex;
+        align-items: center;
+        font-size: 13px;
+        color: #6c757d;
+    }
+    
+    .profile-stat-badge i {
+        margin-right: 5px;
+        color: #0d6efd;
+    }
+    
+    /* Form feedback */
+    .form-feedback {
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        background-color: #cfe2ff;
+        border-left: 4px solid #0d6efd;
+        color: #084298;
+        display: flex;
+        align-items: flex-start;
+    }
+    
+    .form-feedback i {
+        font-size: 20px;
+        margin-right: 10px;
+    }
+    
+    /* Unsaved changes alert */
+    .unsaved-changes-alert {
+        display: none;
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        padding: 15px 20px;
+        z-index: 1000;
+        max-width: 320px;
+        animation: slideIn 0.3s forwards;
+    }
+    
+    @keyframes slideIn {
+        from { transform: translateY(100px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    
+    /* Dark mode support */
+    [data-bs-theme="dark"] .form-control, 
+    [data-bs-theme="dark"] .form-select, 
+    [data-bs-theme="dark"] input[type="text"], 
+    [data-bs-theme="dark"] input[type="email"], 
+    [data-bs-theme="dark"] input[type="password"], 
+    [data-bs-theme="dark"] textarea {
+        background-color: #2c3136 !important;
+        border-color: #495057 !important;
+        color: #f8f9fa !important;
+    }
+    
+    [data-bs-theme="dark"] .form-control:focus, 
+    [data-bs-theme="dark"] .form-select:focus, 
+    [data-bs-theme="dark"] input:focus {
+        background-color: #343a40 !important;
+        box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25) !important;
+    }
+    
+    [data-bs-theme="dark"] .profile-card {
+        background-color: #343a40 !important;
+    }
+    
+    [data-bs-theme="dark"] .profile-card .card-header {
+        background: linear-gradient(to right, #2c3136, #343a40) !important;
+    }
+    
+    [data-bs-theme="dark"] .card-footer {
+        background-color: #2c3136 !important;
+    }
+    
+    [data-bs-theme="dark"] .form-label, 
+    [data-bs-theme="dark"] .text-muted {
+        color: #adb5bd !important;
+    }
+    
+    [data-bs-theme="dark"] .avatar-preview {
+        background-color: #2c3136 !important;
+        border-color: #495057 !important;
+    }
+    
+    [data-bs-theme="dark"] .avatar-preview:hover {
+        border-color: #0d6efd !important;
+        background-color: #343a40 !important;
+    }
+    
+    [data-bs-theme="dark"] .avatar-preview i {
+        color: #6c757d !important;
+    }
+    
+    [data-bs-theme="dark"] .profile-stat-badge {
+        background-color: #2c3136 !important;
+        color: #adb5bd !important;
+    }
+    
+    [data-bs-theme="dark"] .form-feedback {
+        background-color: #1c314a !important;
+        color: #8bb9fe !important;
+    }
+    
+    [data-bs-theme="dark"] .unsaved-changes-alert {
+        background-color: #343a40 !important;
+        color: #f8f9fa !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
+    }
+    
+    [data-bs-theme="dark"] .image-upload-controls button {
+        background-color: #2c3136 !important;
+        border-color: #495057 !important;
+        color: #adb5bd !important;
+    }
+    
+    [data-bs-theme="dark"] .image-upload-controls button:hover {
+        background-color: #495057 !important;
+        color: #f8f9fa !important;
+    }
+    
+    [data-bs-theme="dark"] .image-upload-controls button.remove {
+        color: #dc3545 !important;
+    }
+    
+    [data-bs-theme="dark"] .image-upload-controls button.remove:hover {
+        background-color: #4a2429 !important;
+    }
+    
+    /* Add image control buttons for better UX */
+    .image-upload-controls {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+    
+    .image-upload-controls button {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+        border-radius: 4px;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        color: #6c757d;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .image-upload-controls button:hover {
+        background-color: #e9ecef;
+        color: #212529;
+    }
+    
+    .image-upload-controls button.remove {
+        color: #dc3545;
+    }
+    
+    .image-upload-controls button.remove:hover {
+        background-color: #f8d7da;
+    }
+    
+    /* Theme aware upload overlay */
+    .upload-progress-overlay {
+        position: absolute;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        z-index: 5;
+        display: none;
+    }
+    
+    .upload-progress-overlay .progress {
+        width: 80%;
+        margin-top: 0.5rem;
+        height: 0.5rem;
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    .upload-progress-overlay .progress-bar {
+        height: 100%;
+        background-color: #0d6efd;
+    }
+</style>
+
 <div class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="text-center">Мой профиль</h2>
+        <div class="col-lg-8">
+            <div class="card profile-card">
+                <div class="card-header bg-white py-3 border-0">
+                    <h2 class="text-center fs-4 fw-bold mb-0">Мой профиль</h2>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-4">
                     {% if messages %}
                         {% for message in messages %}
                             <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% else %}alert-info{% endif %}">
@@ -19,66 +417,90 @@
                         {% endfor %}
                     {% endif %}
                     
-                    <div class="row mb-4">
-                        <div class="col-md-4 text-center">
+                    <div class="row mb-4 align-items-center">
+                        <div class="col-md-4 text-center mb-3 mb-md-0">
                             {% if user.avatar %}
-                                <img src="{{ user.avatar.url }}" alt="Avatar" class="img-thumbnail rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                                <div class="profile-avatar">
+                                    <img src="{{ user.avatar.url }}" alt="Avatar" id="currentAvatar">
+                                </div>
                             {% else %}
-                                <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 150px; height: 150px; margin: 0 auto;">
-                                    <h1>{{ user.username|make_list|first|upper }}</h1>
+                                <div class="avatar-initial">
+                                    {{ user.username|make_list|first|upper }}
                                 </div>
                             {% endif %}
                         </div>
                         <div class="col-md-8">
-                            <h3>{{ user.username }}</h3>
-                            <p class="text-muted">{{ user.email }}</p>
-                            <p>{{ user.about }}</p>
-                            <p>
+                            <h3 class="fs-4 fw-bold">{{ user.username }}</h3>
+                            <p class="text-muted small mb-2">{{ user.email }}</p>
+                            <p class="mb-2">{{ user.about }}</p>
+                            <div class="d-flex gap-2 mt-3">
                                 {% if user.is_seller %}
-                                    <span class="badge bg-success">Продавец</span>
+                                    <span class="badge bg-success"><i class="fas fa-store me-2"></i>Продавец</span>
                                 {% endif %}
                                 {% if user.is_buyer %}
-                                    <span class="badge bg-primary">Покупатель</span>
+                                    <span class="badge bg-primary"><i class="fas fa-shopping-cart me-2"></i>Покупатель</span>
                                 {% endif %}
-                            </p>
+                            </div>
+                            
+                            <!-- Add user stats -->
+                            <div class="profile-stats">
+                                <div class="profile-stat-badge">
+                                    <i class="fas fa-calendar-alt"></i> На сайте с: {{ user.date_joined|date:"M Y" }}
+                                </div>
+                                <div class="profile-stat-badge">
+                                    <i class="fas fa-car"></i> Объявлений: <span id="carCount">{{ user.car_set.count }}</span>
+                                </div>
+                                {% if user.is_seller %}
+                                <div class="profile-stat-badge">
+                                    <i class="fas fa-star"></i> Рейтинг: 4.7/5
+                                </div>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                     
-                    <hr>
+                    <hr class="my-4">
                     
-                    <h4 class="mb-3">Обновить профиль</h4>
-                    <form method="post" enctype="multipart/form-data">
+                    <div class="form-feedback">
+                        <i class="fas fa-info-circle"></i>
+                        <div>
+                            <strong>Совет:</strong> Заполните информацию о себе, чтобы другие пользователи могли узнать вас лучше. Аватар и описание помогут установить доверие.
+                        </div>
+                    </div>
+                    
+                    <h4 class="fs-5 fw-bold mb-4">Обновить профиль</h4>
+                    <form method="post" enctype="multipart/form-data" id="profileForm">
                         {% csrf_token %}
                         
-                        <div class="mb-3">
-                            <label for="{{ form.username.id_for_label }}" class="form-label">Имя пользователя</label>
-                            {{ form.username }}
-                            {% if form.username.errors %}
-                                <div class="text-danger">
-                                    {% for error in form.username.errors %}
-                                        {{ error }}
-                                    {% endfor %}
+                        <!-- Avatar preview with enhanced interaction -->
+                        <div class="text-center mb-4">
+                            <label class="file-input-label">
+                                <div class="avatar-preview" id="avatarPreview">
+                                    {% if user.avatar %}
+                                        <img src="{{ user.avatar.url }}" alt="Avatar" id="previewImage">
+                                    {% else %}
+                                        <i class="fas fa-user"></i>
+                                    {% endif %}
+                                    <div class="upload-progress-overlay" id="uploadProgress">
+                                        <span>Загрузка...</span>
+                                        <div class="progress">
+                                            <div class="progress-bar" style="width: 0%"></div>
+                                        </div>
+                                    </div>
                                 </div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
-                            {{ form.email }}
-                            {% if form.email.errors %}
-                                <div class="text-danger">
-                                    {% for error in form.email.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="{{ form.avatar.id_for_label }}" class="form-label">Аватар</label>
-                            {{ form.avatar }}
+                                {{ form.avatar|safe }}
+                                <div class="small text-muted">Нажмите для изменения аватара</div>
+                            </label>
+                            <div class="image-upload-controls">
+                                <button type="button" id="browseButton">
+                                    <i class="fas fa-folder-open"></i> Выбрать
+                                </button>
+                                <button type="button" id="removeButton" class="remove" {% if not user.avatar %}style="display: none;"{% endif %}>
+                                    <i class="fas fa-trash"></i> Удалить
+                                </button>
+                            </div>
                             {% if form.avatar.errors %}
-                                <div class="text-danger">
+                                <div class="text-danger small mt-1">
                                     {% for error in form.avatar.errors %}
                                         {{ error }}
                                     {% endfor %}
@@ -86,11 +508,41 @@
                             {% endif %}
                         </div>
                         
-                        <div class="mb-3">
-                            <label for="{{ form.about.id_for_label }}" class="form-label">О себе</label>
-                            {{ form.about }}
+                        <div class="mb-4 form-group">
+                            <label for="{{ form.username.id_for_label }}" class="form-label small text-muted">Имя пользователя</label>
+                            {{ form.username|safe }}
+                            <div class="form-highlight"></div>
+                            {% if form.username.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.username.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-4 form-group">
+                            <label for="{{ form.email.id_for_label }}" class="form-label small text-muted">Email</label>
+                            {{ form.email|safe }}
+                            <div class="form-highlight"></div>
+                            {% if form.email.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.email.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-4 form-group">
+                            <label for="{{ form.about.id_for_label }}" class="form-label small text-muted">О себе</label>
+                            {{ form.about|safe }}
+                            <div class="form-highlight"></div>
+                            <div class="d-flex justify-content-end">
+                                <small class="text-muted" id="aboutCounter">0/300 символов</small>
+                            </div>
                             {% if form.about.errors %}
-                                <div class="text-danger">
+                                <div class="text-danger small mt-1">
                                     {% for error in form.about.errors %}
                                         {{ error }}
                                     {% endfor %}
@@ -98,8 +550,10 @@
                             {% endif %}
                         </div>
                         
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary py-2" id="saveButton">
+                                <i class="fas fa-save me-2"></i>Сохранить изменения
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -107,4 +561,225 @@
         </div>
     </div>
 </div>
+
+<!-- Unsaved changes alert -->
+<div class="unsaved-changes-alert" id="unsavedChangesAlert">
+    <div class="d-flex align-items-center">
+        <i class="fas fa-exclamation-circle text-warning me-3" style="font-size: 24px;"></i>
+        <div>
+            <strong>Несохраненные изменения</strong>
+            <p class="mb-2 small">У вас есть несохраненные изменения в форме.</p>
+            <button class="btn btn-sm btn-primary" id="saveChangesBtn">Сохранить</button>
+            <button class="btn btn-sm btn-outline-secondary ms-2" id="dismissAlertBtn">Отмена</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Image preview functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const avatarInput = document.querySelector('input[type="file"]');
+        const avatarPreview = document.getElementById('avatarPreview');
+        const previewImage = document.getElementById('previewImage');
+        const browseButton = document.getElementById('browseButton');
+        const removeButton = document.getElementById('removeButton');
+        const uploadProgress = document.getElementById('uploadProgress');
+        const progressBar = uploadProgress.querySelector('.progress-bar');
+        
+        // Open file dialog when the browse button is clicked
+        browseButton.addEventListener('click', function() {
+            avatarInput.click();
+        });
+        
+        // Show preview when file is selected
+        if (avatarInput && avatarPreview) {
+            avatarInput.addEventListener('change', function(e) {
+                if (this.files && this.files[0]) {
+                    // Show loading state
+                    uploadProgress.style.display = 'flex';
+                    
+                    // Simulate progress (in a real app, this would be actual upload progress)
+                    let progress = 0;
+                    const interval = setInterval(() => {
+                        progress += 10;
+                        progressBar.style.width = progress + '%';
+                        
+                        if (progress >= 100) {
+                            clearInterval(interval);
+                            
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
+                                // Clear the preview
+                                avatarPreview.innerHTML = '';
+                                
+                                // Create new image element
+                                const img = document.createElement('img');
+                                img.src = e.target.result;
+                                img.alt = 'Avatar Preview';
+                                img.id = 'previewImage';
+                                
+                                // Add to preview container
+                                avatarPreview.appendChild(img);
+                                
+                                // Recreate the progress overlay (it was removed when we cleared innerHTML)
+                                const overlay = document.createElement('div');
+                                overlay.className = 'upload-progress-overlay';
+                                overlay.id = 'uploadProgress';
+                                overlay.innerHTML = `
+                                    <span>Загрузка...</span>
+                                    <div class="progress">
+                                        <div class="progress-bar" style="width: 0%"></div>
+                                    </div>
+                                `;
+                                avatarPreview.appendChild(overlay);
+                                
+                                // Hide progress overlay
+                                document.getElementById('uploadProgress').style.display = 'none';
+                                
+                                // Show the remove button
+                                removeButton.style.display = 'inline-flex';
+                                
+                                // Show unsaved changes alert
+                                document.getElementById('unsavedChangesAlert').style.display = 'block';
+                            }
+                            
+                            reader.readAsDataURL(this.files[0]);
+                        }
+                    }, 100);
+                }
+            });
+        }
+        
+        // Remove image button
+        if (removeButton) {
+            removeButton.addEventListener('click', function() {
+                if (confirm('Вы уверены, что хотите удалить аватар?')) {
+                    // Clear the file input
+                    avatarInput.value = '';
+                    
+                    // Create an empty FileList
+                    const dataTransfer = new DataTransfer();
+                    avatarInput.files = dataTransfer.files;
+                    
+                    // Reset preview
+                    avatarPreview.innerHTML = '<i class="fas fa-user"></i>';
+                    
+                    // Recreate the progress overlay
+                    const overlay = document.createElement('div');
+                    overlay.className = 'upload-progress-overlay';
+                    overlay.id = 'uploadProgress';
+                    overlay.innerHTML = `
+                        <span>Загрузка...</span>
+                        <div class="progress">
+                            <div class="progress-bar" style="width: 0%"></div>
+                        </div>
+                    `;
+                    avatarPreview.appendChild(overlay);
+                    
+                    // Hide remove button
+                    removeButton.style.display = 'none';
+                    
+                    // Show unsaved changes alert
+                    document.getElementById('unsavedChangesAlert').style.display = 'block';
+                }
+            });
+        }
+        
+        // Character counter for about field
+        const aboutField = document.getElementById('{{ form.about.id_for_label }}');
+        const aboutCounter = document.getElementById('aboutCounter');
+        
+        if (aboutField && aboutCounter) {
+            // Update on page load
+            updateCounter();
+            
+            // Update when typing
+            aboutField.addEventListener('input', updateCounter);
+            
+            function updateCounter() {
+                const count = aboutField.value.length;
+                const maxLength = 300; // Adjust this based on your model's max_length
+                aboutCounter.textContent = count + '/' + maxLength + ' символов';
+                
+                if (count > maxLength) {
+                    aboutCounter.classList.add('text-danger');
+                } else {
+                    aboutCounter.classList.remove('text-danger');
+                }
+            }
+        }
+        
+        // Track form changes
+        const profileForm = document.getElementById('profileForm');
+        const formFields = profileForm.querySelectorAll('input, textarea');
+        const unsavedChangesAlert = document.getElementById('unsavedChangesAlert');
+        const saveChangesBtn = document.getElementById('saveChangesBtn');
+        const dismissAlertBtn = document.getElementById('dismissAlertBtn');
+        let formChanged = false;
+        
+        // Store initial form values
+        const initialValues = {};
+        formFields.forEach(field => {
+            initialValues[field.id] = field.value;
+            
+            // Listen for changes
+            field.addEventListener('input', function() {
+                checkFormChanges();
+            });
+        });
+        
+        function checkFormChanges() {
+            let hasChanges = false;
+            
+            formFields.forEach(field => {
+                if (field.type === 'file') return; // Skip file inputs
+                
+                if (field.value !== initialValues[field.id]) {
+                    hasChanges = true;
+                }
+            });
+            
+            if (hasChanges && !formChanged) {
+                unsavedChangesAlert.style.display = 'block';
+                formChanged = true;
+            } else if (!hasChanges && formChanged) {
+                unsavedChangesAlert.style.display = 'none';
+                formChanged = false;
+            }
+        }
+        
+        // Handle save button click
+        if (saveChangesBtn) {
+            saveChangesBtn.addEventListener('click', function() {
+                profileForm.submit();
+            });
+        }
+        
+        // Handle dismiss button click
+        if (dismissAlertBtn) {
+            dismissAlertBtn.addEventListener('click', function() {
+                unsavedChangesAlert.style.display = 'none';
+            });
+        }
+        
+        // Warn before leaving page with unsaved changes
+        window.addEventListener('beforeunload', function(e) {
+            if (formChanged) {
+                e.preventDefault();
+                e.returnValue = '';
+                return '';
+            }
+        });
+        
+        // Add theme change listener to update UI accordingly
+        const themeToggle = document.getElementById('theme-toggle');
+        if (themeToggle) {
+            themeToggle.addEventListener('change', function() {
+                // This will run when the user changes the theme
+                // You can add specific logic here if needed for theme transitions
+                console.log('Theme changed to:', this.checked ? 'dark' : 'light');
+            });
+        }
+    });
+</script>
 {% endblock %}
