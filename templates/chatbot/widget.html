@@ -46,3 +46,40 @@
         </div>
     </div>
 </div>
+
+<style>
+    /* Additional dark theme styles for chatbot widget */
+    [data-bs-theme="dark"] .chatbot-widget {
+        background-color: #343a40;
+        border: 1px solid #495057;
+    }
+    
+    [data-bs-theme="dark"] .chatbot-input {
+        border-top-color: #495057;
+    }
+    
+    [data-bs-theme="dark"] .chatbot-footer {
+        background-color: #212529;
+        border-top-color: #495057;
+    }
+    
+    [data-bs-theme="dark"] .bot-message .message-content {
+        background-color: #495057;
+        color: #f8f9fa;
+    }
+    
+    [data-bs-theme="dark"] .user-message .message-content {
+        background-color: #0d6efd;
+        color: white;
+    }
+    
+    [data-bs-theme="dark"] .form-check-label {
+        color: #f8f9fa;
+    }
+    
+    /* Make the toggle switch blue in dark mode when checked */
+    [data-bs-theme="dark"] .form-check-input:checked {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+</style>

@@ -3,6 +3,61 @@
 {% block title %}Сравнение автомобилей{% endblock %}
 
 {% block content %}
+<style>
+    /* Dark mode support for compare table */
+    [data-bs-theme="dark"] .table {
+        color: #f8f9fa !important;
+    }
+    
+    /* Fix for table header not changing in dark mode */
+    [data-bs-theme="dark"] thead.table-light,
+    [data-bs-theme="dark"] .table > thead.table-light > tr > th,
+    [data-bs-theme="dark"] .table > tbody > tr > th {
+        background-color: #343a40 !important;
+        color: #f8f9fa !important;
+        border-color: #495057 !important;
+    }
+    
+    [data-bs-theme="dark"] .table-bordered {
+        border-color: #495057 !important;
+    }
+    
+    [data-bs-theme="dark"] .table-bordered td,
+    [data-bs-theme="dark"] .table-bordered th {
+        border-color: #495057 !important;
+    }
+    
+    /* Enhanced highlighting for differences */
+    .highlight-different {
+        background-color: rgba(13, 110, 253, 0.1);
+    }
+    
+    [data-bs-theme="dark"] .highlight-different {
+        background-color: rgba(13, 110, 253, 0.2);
+    }
+    
+    /* Highlight for better value (e.g. newer year, lower mileage) */
+    .highlight-better {
+        background-color: rgba(25, 135, 84, 0.1);
+    }
+    
+    [data-bs-theme="dark"] .highlight-better {
+        background-color: rgba(25, 135, 84, 0.2);
+    }
+    
+    /* Improve image display */
+    .car-compare-img {
+        height: 150px;
+        object-fit: cover;
+        border-radius: 6px;
+        transition: transform 0.3s;
+    }
+    
+    .car-compare-img:hover {
+        transform: scale(1.05);
+    }
+</style>
+
 <div class="container">
     <h1 class="mb-4">Сравнение автомобилей</h1>
     
@@ -47,7 +102,9 @@
                     {% for car in cars %}
                     <td>
                         {% if car.get_primary_image %}
-                        <img src="{{ car.get_primary_image.image.url }}" alt="{{ car.brand }} {{ car.model }}" class="img-fluid" style="max-height: 150px;">
+                        <a href="{{ car.get_absolute_url }}">
+                            <img src="{{ car.get_primary_image.image.url }}" alt="{{ car.brand }} {{ car.model }}" class="img-fluid car-compare-img">
+                        </a>
                         {% else %}
                         <div class="text-muted">Нет фото</div>
                         {% endif %}
@@ -88,7 +145,25 @@
                 </tr>
                 <tr>
                     <td>Объем двигателя</td>
-                    {% for car in cars %}<td>{% if car.engine_volume %}{{ car.engine_volume }} л{% else %}-{% endif %}</td>{% endfor %}
+                    {% for car in cars %}
+                    <td>
+                        {% if car.engine_size %}
+                            {{ car.engine_size }} л
+                        {% elif car.engine_volume %}
+                            {{ car.engine_volume }} л
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td>Привод</td>
+                    {% for car in cars %}<td>{{ car.get_drive_type_display|default:"-" }}</td>{% endfor %}
+                </tr>
+                <tr>
+                    <td>Цвет</td>
+                    {% for car in cars %}<td>{{ car.color|default:"-" }}</td>{% endfor %}
                 </tr>
                 <tr>
                     <td>Описание</td>
@@ -113,4 +188,67 @@
     </div>
     {% endif %}
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Automatic highlighting of differing values
+        const rows = document.querySelectorAll('table tbody tr');
+        
+        rows.forEach(row => {
+            // Skip the first row (photos) and last row (descriptions)
+            if (row.cells[0].textContent.trim() === 'Фото' || 
+                row.cells[0].textContent.trim() === 'Описание') {
+                return;
+            }
+            
+            const cellValues = [];
+            
+            // Collect values from cells
+            for (let i = 1; i < row.cells.length; i++) {
+                cellValues.push(row.cells[i].textContent.trim());
+            }
+            
+            // Check if all values are the same
+            const allSame = cellValues.every(val => val === cellValues[0]);
+            
+            if (!allSame) {
+                // Add highlighting to cells with different values
+                for (let i = 1; i < row.cells.length; i++) {
+                    row.cells[i].classList.add('highlight-different');
+                }
+                
+                // Special case for "better" values
+                const label = row.cells[0].textContent.trim();
+                
+                if (label === 'Год') {
+                    // Find newest year (highest is better)
+                    const years = cellValues.map(val => parseInt(val) || 0);
+                    const maxYear = Math.max(...years);
+                    
+                    for (let i = 1; i < row.cells.length; i++) {
+                        const year = parseInt(row.cells[i].textContent.trim()) || 0;
+                        if (year === maxYear) {
+                            row.cells[i].classList.add('highlight-better');
+                            row.cells[i].classList.remove('highlight-different');
+                        }
+                    }
+                } else if (label === 'Пробег') {
+                    // Find lowest mileage (lowest is better)
+                    const mileages = cellValues.map(val => {
+                        return parseInt(val.replace(/\D/g, '')) || Infinity;
+                    });
+                    const minMileage = Math.min(...mileages);
+                    
+                    for (let i = 1; i < row.cells.length; i++) {
+                        const mileage = parseInt(row.cells[i].textContent.replace(/\D/g, '')) || Infinity;
+                        if (mileage === minMileage) {
+                            row.cells[i].classList.add('highlight-better');
+                            row.cells[i].classList.remove('highlight-different');
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
 {% endblock %}

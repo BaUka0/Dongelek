@@ -48,6 +48,75 @@
         margin-bottom: 15px;
         color: #0d6efd;
     }
+    
+    /* Action buttons styling - matching car_detail.html */
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .icon-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        border: none;
+        background-color: #f8f9fa;
+        color: #212529;
+        font-size: 16px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    
+    .icon-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .icon-btn.favorited {
+        background-color: #ffebee;
+        color: #e53935;
+    }
+    
+    .icon-btn.compared {
+        background-color: #e3f2fd;
+        color: #1976d2;
+    }
+    
+    [data-bs-theme="dark"] .icon-btn {
+        background-color: #343a40;
+        color: #f8f9fa;
+    }
+    
+    [data-bs-theme="dark"] .icon-btn:hover {
+        background-color: #495057;
+    }
+    
+    [data-bs-theme="dark"] .icon-btn.favorited {
+        background-color: #4a2429;
+        color: #ef9a9a;
+    }
+    
+    [data-bs-theme="dark"] .icon-btn.compared {
+        background-color: #1c313a;
+        color: #90caf9;
+    }
+    
+    /* Card footer for displaying price and actions */
+    .card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        background-color: transparent;
+    }
+    
+    .card-img-top {
+        height: 200px;
+        object-fit: cover;
+    }
 </style>
 {% endblock %}
 
@@ -116,33 +185,39 @@
                     <a href="{{ car.get_absolute_url }}">
                         {% with main_image=car.images.filter.first %}
                             {% if main_image %}
-                                <img src="{{ main_image.image.url }}" class="card-img-top car-image" alt="{{ car }}">
+                                <img src="{{ main_image.image.url }}" class="card-img-top" alt="{{ car }}">
                             {% else %}
-                                <img src="{% static 'cars/images/placeholder.jpg' %}" class="card-img-top car-image" alt="No image available">
+                                <img src="{% static 'cars/images/placeholder.jpg' %}" class="card-img-top" alt="No image available">
                             {% endif %}
                         {% endwith %}
                     </a>
                     
-                    <div class="card-body">
-                        <a href="{{ car.get_absolute_url }}" class="text-decoration-none text-dark">
+                    <div class="card-body pb-2">
+                        <a href="{{ car.get_absolute_url }}" class="text-decoration-none">
                             <h5 class="card-title">{{ car.brand }} {{ car.model }}</h5>
                         </a>
-                        <h6 class="card-subtitle mb-2 text-muted">{{ car.year }} • {{ car.mileage }} km</h6>
-                        
-                        <!-- Price and favorite button in one row -->
-                        <div class="price-container">
-                            <p class="card-text fw-bold text-primary mb-0">{{ car.price }} ₸</p>
-                            <div class="d-flex">
-                                {% if user.is_authenticated %}
-                                    <button class="favorite-btn me-2" data-car-id="{{ car.id }}">
-                                        <i class="{% if car in user.favorites.all|map_attr:'car' %}fas{% else %}far{% endif %} fa-heart"></i>
-                                    </button>
-                                {% endif %}
-                                <a href="{% url 'add_to_compare' car.id %}?next={{ request.path|urlencode }}" class="btn btn-sm btn-outline-secondary">
-                                    <i class="fas fa-balance-scale"></i> Сравнить
-                                </a>
-                            </div>
+                        <p class="card-subtitle mb-2 text-muted">{{ car.year }} • {{ car.mileage }} km</p>
+                    </div>
+                    
+                    <div class="card-footer border-top-0">
+                        <div>
+                            <h6 class="mb-0 text-primary fw-bold">{{ car.price }} ₸</h6>
                         </div>
+                        
+                        {% if user.is_authenticated and user.is_buyer and user != car.seller %}
+                        <div class="action-buttons">
+                            <button type="button" class="icon-btn {% if car in user.favorites.all|map_attr:'car' %}favorited{% endif %} favorite-btn" 
+                                    data-car-id="{{ car.id }}" title="{% if car in user.favorites.all|map_attr:'car' %}Remove from favorites{% else %}Add to favorites{% endif %}">
+                                <i class="{% if car in user.favorites.all|map_attr:'car' %}fas{% else %}far{% endif %} fa-heart"></i>
+                            </button>
+                            
+                            <a href="{% url 'add_to_compare' car.id %}?next={{ request.path|urlencode }}" 
+                               class="icon-btn {% if car in compare_list %}compared{% endif %}" 
+                               title="Compare">
+                                <i class="fas fa-balance-scale"></i>
+                            </a>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -192,35 +267,40 @@
                     <a href="{{ car.get_absolute_url }}">
                         {% with main_image=car.images.filter.first %}
                             {% if main_image %}
-                                <img src="{{ main_image.image.url }}" class="card-img-top car-image" alt="{{ car }}">
+                                <img src="{{ main_image.image.url }}" class="card-img-top" alt="{{ car }}">
                             {% else %}
-                                <img src="{% static 'cars/images/placeholder.jpg' %}" class="card-img-top car-image" alt="No image available">
+                                <img src="{% static 'cars/images/placeholder.jpg' %}" class="card-img-top" alt="No image available">
                             {% endif %}
                         {% endwith %}
                     </a>
                     
-                    <div class="card-body">
-                        <a href="{{ car.get_absolute_url }}" class="text-decoration-none text-dark">
+                    <div class="card-body pb-2">
+                        <a href="{{ car.get_absolute_url }}" class="text-decoration-none">
                             <h5 class="card-title">{{ car.brand }} {{ car.model }}</h5>
                         </a>
-                        <h6 class="card-subtitle mb-2 text-muted">{{ car.year }} • {{ car.mileage }} km</h6>
-                        
-                        <!-- Price and favorite button in one row -->
-                        <div class="price-container">
-                            <p class="card-text fw-bold text-primary mb-0">{{ car.price }} ₸</p>
-                            <div class="d-flex">
-                                {% if user.is_authenticated %}
-                                    <button class="favorite-btn me-2" data-car-id="{{ car.id }}">
-                                        <i class="{% if car in user.favorites.all|map_attr:'car' %}fas{% else %}far{% endif %} fa-heart"></i>
-                                    </button>
-                                {% endif %}
-                                <a href="{% url 'add_to_compare' car.id %}?next={{ request.path|urlencode }}" class="btn btn-sm btn-outline-secondary">
-                                    <i class="fas fa-balance-scale"></i> Сравнить
-                                </a>
-                            </div>
+                        <p class="card-subtitle mb-2 text-muted">{{ car.year }} • {{ car.mileage }} km</p>
+                        <small class="text-muted">{{ car.views_count }} views</small>
+                    </div>
+                    
+                    <div class="card-footer border-top-0">
+                        <div>
+                            <h6 class="mb-0 text-primary fw-bold">{{ car.price }} ₸</h6>
                         </div>
                         
-                        <small class="text-muted">{{ car.views_count }} views</small>
+                        {% if user.is_authenticated and user.is_buyer and user != car.seller %}
+                        <div class="action-buttons">
+                            <button type="button" class="icon-btn {% if car in user.favorites.all|map_attr:'car' %}favorited{% endif %} favorite-btn" 
+                                    data-car-id="{{ car.id }}" title="{% if car in user.favorites.all|map_attr:'car' %}Remove from favorites{% else %}Add to favorites{% endif %}">
+                                <i class="{% if car in user.favorites.all|map_attr:'car' %}fas{% else %}far{% endif %} fa-heart"></i>
+                            </button>
+                            
+                            <a href="{% url 'add_to_compare' car.id %}?next={{ request.path|urlencode }}" 
+                               class="icon-btn {% if car in compare_list %}compared{% endif %}" 
+                               title="Compare">
+                                <i class="fas fa-balance-scale"></i>
+                            </a>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -253,7 +333,33 @@
             }
         });
         
-        // The favorite button handling is now managed by the global script in base.html
+        // Favorite button functionality
+        $('.favorite-btn').click(function() {
+            const carId = $(this).data('car-id');
+            const button = $(this);
+            
+            $.ajax({
+                url: '/cars/toggle-favorite/' + carId + '/',
+                type: 'POST',
+                data: {
+                    'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
+                },
+                success: function(response) {
+                    if (response.is_favorite) {
+                        button.addClass('favorited');
+                        button.find('i').removeClass('far').addClass('fas');
+                        button.attr('title', 'Remove from favorites');
+                    } else {
+                        button.removeClass('favorited');
+                        button.find('i').removeClass('fas').addClass('far');
+                        button.attr('title', 'Add to favorites');
+                    }
+                },
+                error: function() {
+                    alert('There was an error updating your favorites. Please try again.');
+                }
+            });
+        });
     });
 </script>
 {% endblock %}

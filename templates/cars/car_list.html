@@ -4,6 +4,90 @@
 
 {% block title %}Browse Cars - Dongelek{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Action buttons styling - matching car_detail.html */
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .icon-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        border: none;
+        background-color: #f8f9fa;
+        color: #212529;
+        font-size: 16px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    
+    .icon-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .icon-btn.favorited {
+        background-color: #ffebee;
+        color: #e53935;
+    }
+    
+    .icon-btn.compared {
+        background-color: #e3f2fd;
+        color: #1976d2;
+    }
+    
+    [data-bs-theme="dark"] .icon-btn {
+        background-color: #343a40;
+        color: #f8f9fa;
+    }
+    
+    [data-bs-theme="dark"] .icon-btn:hover {
+        background-color: #495057;
+    }
+    
+    [data-bs-theme="dark"] .icon-btn.favorited {
+        background-color: #4a2429;
+        color: #ef9a9a;
+    }
+    
+    [data-bs-theme="dark"] .icon-btn.compared {
+        background-color: #1c313a;
+        color: #90caf9;
+    }
+    
+    /* Card footer for displaying price and actions */
+    .card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        background-color: transparent;
+    }
+    
+    .car-image {
+        height: 180px;
+        object-fit: cover;
+    }
+    
+    /* Dark mode support for filters */
+    [data-bs-theme="dark"] .card {
+        background-color: #343a40;
+        border-color: #495057;
+    }
+    
+    [data-bs-theme="dark"] .card-header {
+        background-color: #2c3136;
+        border-color: #495057;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="row">
     <div class="col-lg-3">
@@ -150,31 +234,37 @@
                                 {% endwith %}
                             </a>
                             
-                            <div class="card-body">
-                                <a href="{{ car.get_absolute_url }}" class="text-decoration-none text-dark">
+                            <div class="card-body pb-2">
+                                <a href="{{ car.get_absolute_url }}" class="text-decoration-none">
                                     <h5 class="card-title">{{ car.brand }} {{ car.model }}</h5>
                                 </a>
-                                <h6 class="card-subtitle mb-2 text-muted">{{ car.year }} • {{ car.mileage }} km</h6>
+                                <p class="card-subtitle mb-2 text-muted">{{ car.year }} • {{ car.mileage }} km</p>
                                 
-                                <!-- Price and favorite button in one row -->
-                                <div class="price-container mb-2">
-                                    <p class="card-text fw-bold text-primary mb-0">{{ car.price }} ₸</p>
-                                    <div class="d-flex">
-                                        {% if user.is_authenticated %}
-                                            <button class="favorite-btn me-2" data-car-id="{{ car.id }}">
-                                                <i class="{% if car in user.favorites.all|map_attr:'car' %}fas{% else %}far{% endif %} fa-heart"></i>
-                                            </button>
-                                        {% endif %}
-                                        <a href="{% url 'add_to_compare' car.id %}?next={{ request.get_full_path|urlencode }}" class="btn btn-sm btn-outline-secondary">
-                                            <i class="fas fa-balance-scale"></i> Сравнить
-                                        </a>
-                                    </div>
-                                </div>
-                                
-                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                <div class="d-flex justify-content-between align-items-center mt-2">
                                     <small class="text-muted">{{ car.city }}, {{ car.region }}</small>
                                     <small class="text-muted">{{ car.created_at|date:"d.m.Y" }}</small>
                                 </div>
+                            </div>
+                            
+                            <div class="card-footer border-top-0">
+                                <div>
+                                    <h6 class="mb-0 text-primary fw-bold">{{ car.price }} ₸</h6>
+                                </div>
+                                
+                                {% if user.is_authenticated and user.is_buyer and user != car.seller %}
+                                <div class="action-buttons">
+                                    <button type="button" class="icon-btn {% if car in user.favorites.all|map_attr:'car' %}favorited{% endif %} favorite-btn" 
+                                            data-car-id="{{ car.id }}" title="{% if car in user.favorites.all|map_attr:'car' %}Remove from favorites{% else %}Add to favorites{% endif %}">
+                                        <i class="{% if car in user.favorites.all|map_attr:'car' %}fas{% else %}far{% endif %} fa-heart"></i>
+                                    </button>
+                                    
+                                    <a href="{% url 'add_to_compare' car.id %}?next={{ request.get_full_path|urlencode }}" 
+                                       class="icon-btn {% if car in compare_list %}compared{% endif %}" 
+                                       title="Compare">
+                                        <i class="fas fa-balance-scale"></i>
+                                    </a>
+                                </div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -223,7 +313,6 @@
         {% endif %}
     </div>
 </div>
-
 {% endblock %}
 
 {% block extra_js %}
@@ -284,17 +373,24 @@
             const btn = $(this);
             
             $.ajax({
-                url: `/cars/favorite/${carId}/`,
+                url: `/cars/toggle-favorite/${carId}/`,
                 type: 'POST',
                 headers: {
                     'X-CSRFToken': '{{ csrf_token }}'
                 },
                 success: function(data) {
                     if (data.is_favorite) {
+                        btn.addClass('favorited');
                         btn.find('i').removeClass('far').addClass('fas');
+                        btn.attr('title', 'Remove from favorites');
                     } else {
+                        btn.removeClass('favorited');
                         btn.find('i').removeClass('fas').addClass('far');
+                        btn.attr('title', 'Add to favorites');
                     }
+                },
+                error: function() {
+                    alert('There was an error updating your favorites. Please try again.');
                 }
             });
         });

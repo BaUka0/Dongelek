@@ -163,6 +163,44 @@
     .list-group-item:hover .delete-session-btn {
         opacity: 1;
     }
+    
+    /* Dark theme styles */
+    [data-bs-theme="dark"] .user-message .message-content {
+        background-color: #0d4588;
+        color: #f8f9fa;
+    }
+    
+    [data-bs-theme="dark"] .bot-message .message-content {
+        background-color: #495057;
+        color: #f8f9fa;
+    }
+    
+    [data-bs-theme="dark"] .message-header small.text-muted {
+        color: #adb5bd !important;
+    }
+    
+    [data-bs-theme="dark"] a.text-decoration-none.text-dark {
+        color: #f8f9fa !important;
+    }
+    
+    [data-bs-theme="dark"] .list-group-item {
+        background-color: #343a40;
+        border-color: #495057;
+    }
+    
+    [data-bs-theme="dark"] .list-group-item:hover {
+        background-color: #495057;
+    }
+    
+    [data-bs-theme="dark"] .card {
+        background-color: #343a40;
+        border-color: #495057;
+    }
+    
+    [data-bs-theme="dark"] .card-header {
+        background-color: #212529;
+        border-bottom-color: #495057;
+    }
 </style>
 {% endblock %}
 
