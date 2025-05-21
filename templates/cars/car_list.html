@@ -2,26 +2,110 @@
 {% load static %}
 {% load custom_filters %}
 
-{% block title %}Browse Cars - Dongelek{% endblock %}
+{% block title %}Каталог автомобилей - Dongelek{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Action buttons styling - matching car_detail.html */
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .icon-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        border: none;
+        background-color: #f8f9fa;
+        color: #212529;
+        font-size: 16px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    
+    .icon-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .icon-btn.favorited {
+        background-color: #ffebee;
+        color: #e53935;
+    }
+    
+    .icon-btn.compared {
+        background-color: #e3f2fd;
+        color: #1976d2;
+    }
+    
+    [data-bs-theme="dark"] .icon-btn {
+        background-color: #343a40;
+        color: #f8f9fa;
+    }
+    
+    [data-bs-theme="dark"] .icon-btn:hover {
+        background-color: #495057;
+    }
+    
+    [data-bs-theme="dark"] .icon-btn.favorited {
+        background-color: #4a2429;
+        color: #ef9a9a;
+    }
+    
+    [data-bs-theme="dark"] .icon-btn.compared {
+        background-color: #1c313a;
+        color: #90caf9;
+    }
+    
+    /* Card footer for displaying price and actions */
+    .card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        background-color: transparent;
+    }
+    
+    .car-image {
+        height: 180px;
+        object-fit: cover;
+    }
+    
+    /* Dark mode support for filters */
+    [data-bs-theme="dark"] .card {
+        background-color: #343a40;
+        border-color: #495057;
+    }
+    
+    [data-bs-theme="dark"] .card-header {
+        background-color: #2c3136;
+        border-color: #495057;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-lg-3">
         <div class="card mb-4">
             <div class="card-header">
-                <h5 class="mb-0">Search & Filters</h5>
+                <h5 class="mb-0">Поиск и фильтры</h5>
             </div>
             <div class="card-body">
                 <form method="get" action="{% url 'car_list' %}">
                     <div class="mb-3">
-                        <label for="q" class="form-label">Search</label>
+                        <label for="q" class="form-label">Поиск</label>
                         <input type="text" class="form-control" id="q" name="q" value="{{ request.GET.q }}">
                     </div>
                     
                     <div class="mb-3">
-                        <label for="brand" class="form-label">Brand</label>
+                        <label for="brand" class="form-label">Марка</label>
                         <select class="form-select" id="brand" name="brand">
-                            <option value="">All Brands</option>
+                            <option value="">Все марки</option>
                             {% for brand in brands %}
                                 <option value="{{ brand.id }}" {% if request.GET.brand|add:"0" == brand.id %}selected{% endif %}>{{ brand.name }}</option>
                             {% endfor %}
@@ -29,18 +113,18 @@
                     </div>
                     
                     <div class="mb-3">
-                        <label for="model" class="form-label">Model</label>
+                        <label for="model" class="form-label">Модель</label>
                         <select class="form-select" id="model" name="model">
-                            <option value="">All Models</option>
+                            <option value="">Все модели</option>
                             <!-- Models will be loaded dynamically -->
                         </select>
                     </div>
                     
                     <div class="row mb-3">
                         <div class="col-6">
-                            <label for="year_from" class="form-label">Year From</label>
+                            <label for="year_from" class="form-label">Год от</label>
                             <select class="form-select" id="year_from" name="year_from">
-                                <option value="">Any</option>
+                                <option value="">Любой</option>
                                 {% for year in ""|ljust:"40" %}
                                     {% with year_val=forloop.counter|add:1985 %}
                                         <option value="{{ year_val }}" {% if request.GET.year_from|add:"0" == year_val %}selected{% endif %}>{{ year_val }}</option>
@@ -49,9 +133,9 @@
                             </select>
                         </div>
                         <div class="col-6">
-                            <label for="year_to" class="form-label">Year To</label>
+                            <label for="year_to" class="form-label">Год до</label>
                             <select class="form-select" id="year_to" name="year_to">
-                                <option value="">Any</option>
+                                <option value="">Любой</option>
                                 {% for year in ""|ljust:"40" %}
                                     {% with year_val=forloop.counter|add:1985 %}
                                         <option value="{{ year_val }}" {% if request.GET.year_to|add:"0" == year_val %}selected{% endif %}>{{ year_val }}</option>
@@ -63,42 +147,42 @@
                     
                     <div class="row mb-3">
                         <div class="col-6">
-                            <label for="price_from" class="form-label">Price From</label>
+                            <label for="price_from" class="form-label">Цена от</label>
                             <input type="number" class="form-control" id="price_from" name="price_from" value="{{ request.GET.price_from }}">
                         </div>
                         <div class="col-6">
-                            <label for="price_to" class="form-label">Price To</label>
+                            <label for="price_to" class="form-label">Цена до</label>
                             <input type="number" class="form-control" id="price_to" name="price_to" value="{{ request.GET.price_to }}">
                         </div>
                     </div>
                     
                     <div class="mb-3">
-                        <label for="fuel_type" class="form-label">Fuel Type</label>
+                        <label for="fuel_type" class="form-label">Тип топлива</label>
                         <select class="form-select" id="fuel_type" name="fuel_type">
-                            <option value="">All Fuel Types</option>
-                            <option value="GAS" {% if request.GET.fuel_type == 'GAS' %}selected{% endif %}>Gasoline</option>
-                            <option value="DIE" {% if request.GET.fuel_type == 'DIE' %}selected{% endif %}>Diesel</option>
-                            <option value="ELE" {% if request.GET.fuel_type == 'ELE' %}selected{% endif %}>Electric</option>
-                            <option value="HYB" {% if request.GET.fuel_type == 'HYB' %}selected{% endif %}>Hybrid</option>
-                            <option value="LPG" {% if request.GET.fuel_type == 'LPG' %}selected{% endif %}>LPG</option>
+                            <option value="">Все типы топлива</option>
+                            <option value="GAS" {% if request.GET.fuel_type == 'GAS' %}selected{% endif %}>Бензин</option>
+                            <option value="DIE" {% if request.GET.fuel_type == 'DIE' %}selected{% endif %}>Дизель</option>
+                            <option value="ELE" {% if request.GET.fuel_type == 'ELE' %}selected{% endif %}>Электро</option>
+                            <option value="HYB" {% if request.GET.fuel_type == 'HYB' %}selected{% endif %}>Гибрид</option>
+                            <option value="LPG" {% if request.GET.fuel_type == 'LPG' %}selected{% endif %}>Газ</option>
                         </select>
                     </div>
                     
                     <div class="mb-3">
-                        <label for="transmission" class="form-label">Transmission</label>
+                        <label for="transmission" class="form-label">Коробка передач</label>
                         <select class="form-select" id="transmission" name="transmission">
-                            <option value="">All Transmissions</option>
-                            <option value="MAN" {% if request.GET.transmission == 'MAN' %}selected{% endif %}>Manual</option>
-                            <option value="AUT" {% if request.GET.transmission == 'AUT' %}selected{% endif %}>Automatic</option>
-                            <option value="SMT" {% if request.GET.transmission == 'SMT' %}selected{% endif %}>Semi-Automatic</option>
-                            <option value="CVT" {% if request.GET.transmission == 'CVT' %}selected{% endif %}>CVT</option>
+                            <option value="">Все коробки передач</option>
+                            <option value="MAN" {% if request.GET.transmission == 'MAN' %}selected{% endif %}>Механика</option>
+                            <option value="AUT" {% if request.GET.transmission == 'AUT' %}selected{% endif %}>Автомат</option>
+                            <option value="SMT" {% if request.GET.transmission == 'SMT' %}selected{% endif %}>Полуавтомат</option>
+                            <option value="CVT" {% if request.GET.transmission == 'CVT' %}selected{% endif %}>Вариатор</option>
                         </select>
                     </div>
                     
                     <div class="mb-3">
-                        <label for="region" class="form-label">Region</label>
+                        <label for="region" class="form-label">Регион</label>
                         <select class="form-select" id="region" name="region">
-                            <option value="">All Regions</option>
+                            <option value="">Все регионы</option>
                             {% for region in regions %}
                                 <option value="{{ region.id }}" {% if request.GET.region|add:"0" == region.id %}selected{% endif %}>{{ region.name }}</option>
                             {% endfor %}
@@ -106,14 +190,14 @@
                     </div>
                     
                     <div class="mb-3">
-                        <label for="city" class="form-label">City</label>
+                        <label for="city" class="form-label">Город</label>
                         <select class="form-select" id="city" name="city">
-                            <option value="">All Cities</option>
+                            <option value="">Все города</option>
                             <!-- Cities will be loaded dynamically -->
                         </select>
                     </div>
                     
-                    <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+                    <button type="submit" class="btn btn-primary w-100">Применить фильтры</button>
                 </form>
             </div>
         </div>
@@ -121,16 +205,16 @@
     
     <div class="col-lg-9">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Available Cars</h2>
+            <h2>Доступные автомобили</h2>
             <div class="d-flex">
-                <label for="sort" class="form-label me-2 pt-2">Sort by:</label>
+                <label for="sort" class="form-label me-2 pt-2">Сортировать:</label>
                 <select class="form-select" id="sort" name="sort" style="width: auto;">
-                    <option value="-created_at" {% if request.GET.sort == '-created_at' or not request.GET.sort %}selected{% endif %}>Newest</option>
-                    <option value="price_asc" {% if request.GET.sort == 'price_asc' %}selected{% endif %}>Price Low to High</option>
-                    <option value="price_desc" {% if request.GET.sort == 'price_desc' %}selected{% endif %}>Price High to Low</option>
-                    <option value="-year" {% if request.GET.sort == '-year' %}selected{% endif %}>Year New to Old</option>
-                    <option value="year" {% if request.GET.sort == 'year' %}selected{% endif %}>Year Old to New</option>
-                    <option value="popular" {% if request.GET.sort == 'popular' %}selected{% endif %}>Most Popular</option>
+                    <option value="-created_at" {% if request.GET.sort == '-created_at' or not request.GET.sort %}selected{% endif %}>Новые</option>
+                    <option value="price_asc" {% if request.GET.sort == 'price_asc' %}selected{% endif %}>По цене (дешевле)</option>
+                    <option value="price_desc" {% if request.GET.sort == 'price_desc' %}selected{% endif %}>По цене (дороже)</option>
+                    <option value="-year" {% if request.GET.sort == '-year' %}selected{% endif %}>По году (новее)</option>
+                    <option value="year" {% if request.GET.sort == 'year' %}selected{% endif %}>По году (старше)</option>
+                    <option value="popular" {% if request.GET.sort == 'popular' %}selected{% endif %}>Популярные</option>
                 </select>
             </div>
         </div>
@@ -145,36 +229,42 @@
                                     {% if main_image %}
                                         <img src="{{ main_image.image.url }}" class="card-img-top car-image" alt="{{ car }}">
                                     {% else %}
-                                        <img src="{% static 'cars/images/placeholder.jpg' %}" class="card-img-top car-image" alt="No image available">
+                                        <img src="{% static 'cars/images/placeholder.jpg' %}" class="card-img-top car-image" alt="Нет изображения">
                                     {% endif %}
                                 {% endwith %}
                             </a>
                             
-                            <div class="card-body">
-                                <a href="{{ car.get_absolute_url }}" class="text-decoration-none text-dark">
+                            <div class="card-body pb-2">
+                                <a href="{{ car.get_absolute_url }}" class="text-decoration-none">
                                     <h5 class="card-title">{{ car.brand }} {{ car.model }}</h5>
                                 </a>
-                                <h6 class="card-subtitle mb-2 text-muted">{{ car.year }} • {{ car.mileage }} km</h6>
+                                <p class="card-subtitle mb-2 text-muted">{{ car.year }} • {{ car.mileage }} км</p>
                                 
-                                <!-- Price and favorite button in one row -->
-                                <div class="price-container mb-2">
-                                    <p class="card-text fw-bold text-primary mb-0">{{ car.price }} ₸</p>
-                                    <div class="d-flex">
-                                        {% if user.is_authenticated %}
-                                            <button class="favorite-btn me-2" data-car-id="{{ car.id }}">
-                                                <i class="{% if car in user.favorites.all|map_attr:'car' %}fas{% else %}far{% endif %} fa-heart"></i>
-                                            </button>
-                                        {% endif %}
-                                        <a href="{% url 'add_to_compare' car.id %}?next={{ request.get_full_path|urlencode }}" class="btn btn-sm btn-outline-secondary">
-                                            <i class="fas fa-balance-scale"></i> Сравнить
-                                        </a>
-                                    </div>
-                                </div>
-                                
-                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                <div class="d-flex justify-content-between align-items-center mt-2">
                                     <small class="text-muted">{{ car.city }}, {{ car.region }}</small>
                                     <small class="text-muted">{{ car.created_at|date:"d.m.Y" }}</small>
                                 </div>
+                            </div>
+                            
+                            <div class="card-footer border-top-0">
+                                <div>
+                                    <h6 class="mb-0 text-primary fw-bold">{{ car.price }} ₸</h6>
+                                </div>
+                                
+                                {% if user.is_authenticated and user.is_buyer and user != car.seller %}
+                                <div class="action-buttons">
+                                    <button type="button" class="icon-btn {% if car in user.favorites.all|map_attr:'car' %}favorited{% endif %} favorite-btn" 
+                                            data-car-id="{{ car.id }}" title="{% if car in user.favorites.all|map_attr:'car' %}Удалить из избранного{% else %}Добавить в избранное{% endif %}">
+                                        <i class="{% if car in user.favorites.all|map_attr:'car' %}fas{% else %}far{% endif %} fa-heart"></i>
+                                    </button>
+                                    
+                                    <a href="{% url 'add_to_compare' car.id %}?next={{ request.get_full_path|urlencode }}" 
+                                       class="icon-btn {% if car in compare_list %}compared{% endif %}" 
+                                       title="Сравнить">
+                                        <i class="fas fa-balance-scale"></i>
+                                    </a>
+                                </div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -186,10 +276,10 @@
                     <ul class="pagination justify-content-center">
                         {% if page_obj.has_previous %}
                             <li class="page-item">
-                                <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1">&laquo; First</a>
+                                <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1">&laquo; Первая</a>
                             </li>
                             <li class="page-item">
-                                <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">Previous</a>
+                                <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">Предыдущая</a>
                             </li>
                         {% endif %}
                         
@@ -207,10 +297,10 @@
                         
                         {% if page_obj.has_next %}
                             <li class="page-item">
-                                <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">Next</a>
+                                <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">Следующая</a>
                             </li>
                             <li class="page-item">
-                                <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+                                <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.paginator.num_pages }}">Последняя &raquo;</a>
                             </li>
                         {% endif %}
                     </ul>
@@ -218,12 +308,11 @@
             {% endif %}
         {% else %}
             <div class="alert alert-info" role="alert">
-                No cars found matching your criteria. Try adjusting your filters.
+                По вашим критериям автомобили не найдены. Попробуйте изменить параметры фильтров.
             </div>
         {% endif %}
     </div>
 </div>
-
 {% endblock %}
 
 {% block extra_js %}
@@ -246,14 +335,14 @@
                     success: function(data) {
                         const modelSelect = $('#model');
                         modelSelect.empty();
-                        modelSelect.append('<option value="">All Models</option>');
+                        modelSelect.append('<option value="">Все модели</option>');
                         data.models.forEach(function(model) {
                             modelSelect.append(`<option value="${model.id}">${model.name}</option>`);
                         });
                     }
                 });
             } else {
-                $('#model').empty().append('<option value="">All Models</option>');
+                $('#model').empty().append('<option value="">Все модели</option>');
             }
         });
         
@@ -267,37 +356,18 @@
                     success: function(data) {
                         const citySelect = $('#city');
                         citySelect.empty();
-                        citySelect.append('<option value="">All Cities</option>');
+                        citySelect.append('<option value="">Все города</option>');
                         data.cities.forEach(function(city) {
                             citySelect.append(`<option value="${city.id}">${city.name}</option>`);
                         });
                     }
                 });
             } else {
-                $('#city').empty().append('<option value="">All Cities</option>');
+                $('#city').empty().append('<option value="">Все города</option>');
             }
         });
         
-        // Toggle favorites with AJAX
-        $('.favorite-btn').click(function() {
-            const carId = $(this).data('car-id');
-            const btn = $(this);
-            
-            $.ajax({
-                url: `/cars/favorite/${carId}/`,
-                type: 'POST',
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}'
-                },
-                success: function(data) {
-                    if (data.is_favorite) {
-                        btn.find('i').removeClass('far').addClass('fas');
-                    } else {
-                        btn.find('i').removeClass('fas').addClass('far');
-                    }
-                }
-            });
-        });
+        
         
         // Trigger change events to load existing data
         if ($('#brand').val()) {

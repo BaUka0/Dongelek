@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{% if form.instance.pk %}Edit{% else %}Create{% endif %} Car Listing - Dongelek{% endblock %}
+{% block title %}{% if form.instance.pk %}Редактирование{% else %}Создание{% endif %} объявления - Dongelek{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -214,19 +214,19 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-lg-8">
-        <h1 class="mb-4">{% if form.instance.pk %}Edit{% else %}Create{% endif %} Car Listing</h1>
+        <h1 class="mb-4">{% if form.instance.pk %}Редактирование{% else %}Создание{% endif %} объявления</h1>
         
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             
             <div class="form-section">
-                <h3 class="form-section-title">Basic Information</h3>
+                <h3 class="form-section-title">Основная информация</h3>
                 <div class="row">
                     <div class="col-md-6 mb-3 required">
-                        <label for="{{ form.brand.id_for_label }}" class="form-label">Brand</label>
+                        <label for="{{ form.brand.id_for_label }}" class="form-label">Марка</label>
                         <div class="input-group">
                             <select name="{{ form.brand.name }}" id="{{ form.brand.id_for_label }}" class="form-select">
-                                <option value="">Select a Brand</option>
+                                <option value="">Выберите марку</option>
                                 {% for choice in form.brand.field.queryset %}
                                     <option value="{{ choice.id }}" {% if form.brand.value|stringformat:"i" == choice.id|stringformat:"i" %}selected{% endif %}>
                                         {{ choice }}
@@ -241,10 +241,10 @@
                     </div>
                     
                     <div class="col-md-6 mb-3 required">
-                        <label for="{{ form.model.id_for_label }}" class="form-label">Model</label>
+                        <label for="{{ form.model.id_for_label }}" class="form-label">Модель</label>
                         <div class="input-group">
                             <select name="{{ form.model.name }}" id="{{ form.model.id_for_label }}" class="form-select">
-                                <option value="">Select a Model</option>
+                                <option value="">Выберите модель</option>
                                 {% if form.model.field.queryset %}
                                     {% for choice in form.model.field.queryset %}
                                         <option value="{{ choice.id }}" {% if form.model.value|stringformat:"i" == choice.id|stringformat:"i" %}selected{% endif %}>
@@ -263,9 +263,9 @@
                 
                 <div class="row">
                     <div class="col-md-4 mb-3 required">
-                        <label for="{{ form.year.id_for_label }}" class="form-label">Year</label>
+                        <label for="{{ form.year.id_for_label }}" class="form-label">Год выпуска</label>
                         <select name="{{ form.year.name }}" id="{{ form.year.id_for_label }}" class="form-select">
-                            <option value="">Select Year</option>
+                            <option value="">Выберите год</option>
                             {% for year in ""|ljust:"40" %}
                                 {% with year_val=forloop.counter|add:1985 %}
                                     <option value="{{ year_val }}" {% if form.year.value|add:"0" == year_val %}selected{% endif %}>{{ year_val }}</option>
@@ -278,7 +278,7 @@
                     </div>
                     
                     <div class="col-md-4 mb-3 required">
-                        <label for="{{ form.price.id_for_label }}" class="form-label">Price (₸)</label>
+                        <label for="{{ form.price.id_for_label }}" class="form-label">Цена (₸)</label>
                         <input type="number" name="{{ form.price.name }}" id="{{ form.price.id_for_label }}" class="form-control" value="{{ form.price.value|default_if_none:'' }}" step="1000">
                         {% if form.price.errors %}
                             <div class="text-danger">{{ form.price.errors }}</div>
@@ -286,7 +286,7 @@
                     </div>
                     
                     <div class="col-md-4 mb-3 required">
-                        <label for="{{ form.mileage.id_for_label }}" class="form-label">Mileage (km)</label>
+                        <label for="{{ form.mileage.id_for_label }}" class="form-label">Пробег (км)</label>
                         <input type="number" name="{{ form.mileage.name }}" id="{{ form.mileage.id_for_label }}" class="form-control" value="{{ form.mileage.value|default_if_none:'' }}">
                         {% if form.mileage.errors %}
                             <div class="text-danger">{{ form.mileage.errors }}</div>
@@ -296,10 +296,10 @@
             </div>
             
             <div class="form-section">
-                <h3 class="form-section-title">Car Specifications</h3>
+                <h3 class="form-section-title">Характеристики автомобиля</h3>
                 <div class="row">
                     <div class="col-md-6 mb-3 required">
-                        <label for="{{ form.fuel_type.id_for_label }}" class="form-label">Fuel Type</label>
+                        <label for="{{ form.fuel_type.id_for_label }}" class="form-label">Тип топлива</label>
                         <select name="{{ form.fuel_type.name }}" id="{{ form.fuel_type.id_for_label }}" class="form-select">
                             {% for choice in form.fuel_type.field.choices %}
                                 <option value="{{ choice.0 }}" {% if form.fuel_type.value == choice.0 %}selected{% endif %}>
@@ -313,7 +313,7 @@
                     </div>
                     
                     <div class="col-md-6 mb-3 required">
-                        <label for="{{ form.transmission.id_for_label }}" class="form-label">Transmission</label>
+                        <label for="{{ form.transmission.id_for_label }}" class="form-label">Коробка передач</label>
                         <select name="{{ form.transmission.name }}" id="{{ form.transmission.id_for_label }}" class="form-select">
                             {% for choice in form.transmission.field.choices %}
                                 <option value="{{ choice.0 }}" {% if form.transmission.value == choice.0 %}selected{% endif %}>
@@ -329,7 +329,7 @@
                 
                 <div class="row">
                     <div class="col-md-6 mb-3 required">
-                        <label for="{{ form.body_type.id_for_label }}" class="form-label">Body Type</label>
+                        <label for="{{ form.body_type.id_for_label }}" class="form-label">Тип кузова</label>
                         <select name="{{ form.body_type.name }}" id="{{ form.body_type.id_for_label }}" class="form-select">
                             {% for choice in form.body_type.field.choices %}
                                 <option value="{{ choice.0 }}" {% if form.body_type.value == choice.0 %}selected{% endif %}>
@@ -343,7 +343,7 @@
                     </div>
                     
                     <div class="col-md-6 mb-3 required">
-                        <label for="{{ form.drive_type.id_for_label }}" class="form-label">Drive Type</label>
+                        <label for="{{ form.drive_type.id_for_label }}" class="form-label">Привод</label>
                         <select name="{{ form.drive_type.name }}" id="{{ form.drive_type.id_for_label }}" class="form-select">
                             {% for choice in form.drive_type.field.choices %}
                                 <option value="{{ choice.0 }}" {% if form.drive_type.value == choice.0 %}selected{% endif %}>
@@ -359,7 +359,7 @@
                 
                 <div class="row">
                     <div class="col-md-6 mb-3 required">
-                        <label for="{{ form.color.id_for_label }}" class="form-label">Color</label>
+                        <label for="{{ form.color.id_for_label }}" class="form-label">Цвет</label>
                         <input type="text" name="{{ form.color.name }}" id="{{ form.color.id_for_label }}" class="form-control" value="{{ form.color.value|default_if_none:'' }}">
                         {% if form.color.errors %}
                             <div class="text-danger">{{ form.color.errors }}</div>
@@ -367,7 +367,7 @@
                     </div>
                     
                     <div class="col-md-6 mb-3">
-                        <label for="{{ form.engine_size.id_for_label }}" class="form-label">Engine Size (L)</label>
+                        <label for="{{ form.engine_size.id_for_label }}" class="form-label">Объем двигателя (л)</label>
                         <input type="number" name="{{ form.engine_size.name }}" id="{{ form.engine_size.id_for_label }}" class="form-control" value="{{ form.engine_size.value|default_if_none:'' }}" step="0.1">
                         {% if form.engine_size.errors %}
                             <div class="text-danger">{{ form.engine_size.errors }}</div>
@@ -377,12 +377,12 @@
             </div>
             
             <div class="form-section">
-                <h3 class="form-section-title">Location in Kazakhstan</h3>
+                <h3 class="form-section-title">Местоположение в Казахстане</h3>
                 <div class="row">
                     <div class="col-md-6 mb-3 required">
-                        <label for="{{ form.region.id_for_label }}" class="form-label">Oblast (Область)</label>
+                        <label for="{{ form.region.id_for_label }}" class="form-label">Область</label>
                         <select name="{{ form.region.name }}" id="{{ form.region.id_for_label }}" class="form-select">
-                            <option value="">Select an Oblast</option>
+                            <option value="">Выберите область</option>
                             {% for choice in form.region.field.queryset %}
                                 <option value="{{ choice.id }}" {% if form.region.value|stringformat:"i" == choice.id|stringformat:"i" %}selected{% endif %}>
                                     {{ choice }}
@@ -395,9 +395,9 @@
                     </div>
                     
                     <div class="col-md-6 mb-3 required">
-                        <label for="{{ form.city.id_for_label }}" class="form-label">City/District (Город/Район)</label>
+                        <label for="{{ form.city.id_for_label }}" class="form-label">Город/Район</label>
                         <select name="{{ form.city.name }}" id="{{ form.city.id_for_label }}" class="form-select">
-                            <option value="">Select a City/District</option>
+                            <option value="">Выберите город/район</option>
                             {% if form.city.field.queryset %}
                                 {% for choice in form.city.field.queryset %}
                                     <option value="{{ choice.id }}" {% if form.city.value|stringformat:"i" == choice.id|stringformat:"i" %}selected{% endif %}>
@@ -414,25 +414,25 @@
             </div>
             
             <div class="form-section">
-                <h3 class="form-section-title">Description</h3>
+                <h3 class="form-section-title">Описание</h3>
                 <div class="mb-3 required">
-                    <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                    <label for="{{ form.description.id_for_label }}" class="form-label">Описание</label>
                     <textarea name="{{ form.description.name }}" id="{{ form.description.id_for_label }}" class="form-control" rows="5">{{ form.description.value|default_if_none:'' }}</textarea>
                     {% if form.description.errors %}
                         <div class="text-danger">{{ form.description.errors }}</div>
                     {% endif %}
-                    <div class="form-text">Provide a detailed description of the car, including its condition, unique features, and reason for selling.</div>
+                    <div class="form-text">Предоставьте подробное описание автомобиля, включая его состояние, уникальные особенности и причину продажи.</div>
                 </div>
             </div>
             
             <div class="form-section">
-                <h3 class="form-section-title">Images</h3>
-                <p class="text-muted mb-3">You can upload from 1 to 10 photos. One image must be set as the main image shown in listings.</p>
+                <h3 class="form-section-title">Фотографии</h3>
+                <p class="text-muted mb-3">Вы можете загрузить от 1 до 10 фотографий. Одна фотография должна быть установлена как главная для отображения в списках.</p>
                 
                 {{ image_formset.management_form }}
                 
                 <div class="alert alert-info">
-                    Please select at least one image for your car listing.
+                    Пожалуйста, выберите хотя бы одну фотографию для вашего объявления.
                 </div>
                 
                 {% if image_formset.non_form_errors %}
@@ -451,19 +451,19 @@
                         {{ image_formset.0.id }}
                         {% if image_formset.0.instance.pk and image_formset.0.instance.image %}
                             {% if image_formset.0.instance.is_primary %}
-                            <div class="main-photo-badge">Main Photo</div>
+                            <div class="main-photo-badge">Главное фото</div>
                             {% endif %}
-                            <img src="{{ image_formset.0.instance.image.url }}" alt="Car image" class="upload-preview">
+                            <img src="{{ image_formset.0.instance.image.url }}" alt="Фото автомобиля" class="upload-preview">
                             <div class="photo-controls">
                                 {% if not image_formset.0.instance.is_primary %}
-                                <span class="set-main-btn" data-index="0"><i class="fas fa-star"></i> Set as main</span>
+                                <span class="set-main-btn" data-index="0"><i class="fas fa-star"></i> Сделать главным</span>
                                 {% endif %}
-                                <span class="delete-photo-btn" data-index="0"><i class="fas fa-trash"></i> Delete</span>
+                                <span class="delete-photo-btn" data-index="0"><i class="fas fa-trash"></i> Удалить</span>
                             </div>
                             <input type="checkbox" name="images-0-DELETE" id="id_images-0-DELETE" class="delete-checkbox" style="display: none;">
                         {% else %}
                             <div class="upload-icon"><i class="fas fa-arrow-up"></i></div>
-                            <span>Upload photo</span>
+                            <span>Загрузить фото</span>
                         {% endif %}
                         <input type="hidden" name="images-0-is_primary" id="id_images-0-is_primary" value="{% if image_formset.0.instance.is_primary %}True{% else %}False{% endif %}" class="is-primary-input">
                         
@@ -479,19 +479,19 @@
                                 {{ image_form.id }}
                                 {% if image_form.instance.pk and image_form.instance.image %}
                                     {% if image_form.instance.is_primary %}
-                                    <div class="main-photo-badge">Main Photo</div>
+                                    <div class="main-photo-badge">Главное фото</div>
                                     {% endif %}
-                                    <img src="{{ image_form.instance.image.url }}" alt="Car image" class="upload-preview">
+                                    <img src="{{ image_form.instance.image.url }}" alt="Фото автомобиля" class="upload-preview">
                                     <div class="photo-controls">
                                         {% if not image_form.instance.is_primary %}
-                                        <span class="set-main-btn" data-index="{{ forloop.counter0 }}"><i class="fas fa-star"></i> Set as main</span>
+                                        <span class="set-main-btn" data-index="{{ forloop.counter0 }}"><i class="fas fa-star"></i> Сделать главным</span>
                                         {% endif %}
-                                        <span class="delete-photo-btn" data-index="{{ forloop.counter0 }}"><i class="fas fa-trash"></i> Delete</span>
+                                        <span class="delete-photo-btn" data-index="{{ forloop.counter0 }}"><i class="fas fa-trash"></i> Удалить</span>
                                     </div>
                                     <input type="checkbox" name="images-{{ forloop.counter0 }}-DELETE" id="id_images-{{ forloop.counter0 }}-DELETE" class="delete-checkbox" style="display: none;">
                                 {% else %}
                                     <div class="upload-icon"><i class="fas fa-arrow-up"></i></div>
-                                    <span>Upload photo</span>
+                                    <span>Загрузить фото</span>
                                 {% endif %}
                                 <input type="hidden" name="images-{{ forloop.counter0 }}-is_primary" id="id_images-{{ forloop.counter0 }}-is_primary" value="{% if image_form.instance.is_primary %}True{% else %}False{% endif %}" class="is-primary-input">
                                 
@@ -502,14 +502,14 @@
                     <!-- Add more photos button -->
                     <div class="photo-upload-box add-more-photos" id="add-more-photos">
                         <div class="cross-icon">+</div>
-                        <span>Add more photos</span>
+                        <span>Добавить ещё фото</span>
                     </div>
                 </div>
             </div>
             
             <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-5">
-                <a href="{% if form.instance.pk %}{{ form.instance.get_absolute_url }}{% else %}{% url 'car_list' %}{% endif %}" class="btn btn-secondary me-md-2">Cancel</a>
-                <button type="submit" class="btn btn-primary">Save</button>
+                <a href="{% if form.instance.pk %}{{ form.instance.get_absolute_url }}{% else %}{% url 'car_list' %}{% endif %}" class="btn btn-secondary me-md-2">Отмена</a>
+                <button type="submit" class="btn btn-primary">Сохранить</button>
             </div>
         </form>
     </div>
@@ -520,19 +520,19 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="addBrandModalLabel">Add New Brand</h5>
+                <h5 class="modal-title" id="addBrandModalLabel">Добавить новую марку</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-                    <label for="new-brand-name" class="form-label">Brand Name</label>
-                    <input type="text" class="form-control" id="new-brand-name" placeholder="Enter brand name">
+                    <label for="new-brand-name" class="form-label">Название марки</label>
+                    <input type="text" class="form-control" id="new-brand-name" placeholder="Введите название марки">
                     <div class="invalid-feedback" id="brand-error-feedback"></div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="save-brand-btn">Save Brand</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-primary" id="save-brand-btn">Сохранить марку</button>
             </div>
         </div>
     </div>
@@ -543,23 +543,23 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="addModelModalLabel">Add New Model</h5>
+                <h5 class="modal-title" id="addModelModalLabel">Добавить новую модель</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-                    <label for="model-brand-display" class="form-label">Brand</label>
+                    <label for="model-brand-display" class="form-label">Марка</label>
                     <input type="text" class="form-control" id="model-brand-display" readonly>
                 </div>
                 <div class="mb-3">
-                    <label for="new-model-name" class="form-label">Model Name</label>
-                    <input type="text" class="form-control" id="new-model-name" placeholder="Enter model name">
+                    <label for="new-model-name" class="form-label">Название модели</label>
+                    <input type="text" class="form-control" id="new-model-name" placeholder="Введите название модели">
                     <div class="invalid-feedback" id="model-error-feedback"></div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="save-model-btn">Save Model</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-primary" id="save-model-btn">Сохранить модель</button>
             </div>
         </div>
     </div>
@@ -584,7 +584,7 @@
                     dataType: 'json',
                     success: function(data) {
                         const modelSelect = $('#{{ form.model.id_for_label }}');
-                        modelSelect.html('<option value="">Select a Model</option>');
+                        modelSelect.html('<option value="">Выберите модель</option>');
                         data.models.forEach(function(model) {
                             modelSelect.append(`<option value="${model.id}">${model.name}</option>`);
                         });
@@ -592,7 +592,7 @@
                     }
                 });
             } else {
-                $('#{{ form.model.id_for_label }}').html('<option value="">Select a Model</option>');
+                $('#{{ form.model.id_for_label }}').html('<option value="">Выберите модель</option>');
                 $('#addModelBtn').prop('disabled', true);
             }
         });
@@ -607,14 +607,14 @@
                     dataType: 'json',
                     success: function(data) {
                         const citySelect = $('#{{ form.city.id_for_label }}');
-                        citySelect.html('<option value="">Select a City/District</option>');
+                        citySelect.html('<option value="">Выберите город/район</option>');
                         data.cities.forEach(function(city) {
                             citySelect.append(`<option value="${city.id}">${city.name}</option>`);
                         });
                     }
                 });
             } else {
-                $('#{{ form.city.id_for_label }}').html('<option value="">Select a City/District</option>');
+                $('#{{ form.city.id_for_label }}').html('<option value="">Выберите город/район</option>');
             }
         });
         
@@ -635,14 +635,14 @@
                     if (photoBox.find('img.upload-preview').length) {
                         photoBox.find('img.upload-preview').attr('src', e.target.result);
                     } else {
-                        photoBox.append(`<img src="${e.target.result}" alt="Car image" class="upload-preview">`);
+                        photoBox.append(`<img src="${e.target.result}" alt="Фото автомобиля" class="upload-preview">`);
                         
                         // Add controls
                         const isFirstUpload = $('.photo-upload-box.with-image').length === 0;
                         let controlsHtml = `
                             <div class="photo-controls">
-                                ${!isFirstUpload ? `<span class="set-main-btn" data-index="${index}"><i class="fas fa-star"></i> Set as main</span>` : ''}
-                                <span class="delete-photo-btn" data-index="${index}"><i class="fas fa-trash"></i> Delete</span>
+                                ${!isFirstUpload ? `<span class="set-main-btn" data-index="${index}"><i class="fas fa-star"></i> Сделать главным</span>` : ''}
+                                <span class="delete-photo-btn" data-index="${index}"><i class="fas fa-trash"></i> Удалить</span>
                             </div>
                             <input type="checkbox" name="images-${index}-DELETE" id="id_images-${index}-DELETE" class="delete-checkbox" style="display: none;">
                         `;
@@ -677,7 +677,7 @@
             
             // Set the selected photo as main
             $(`#photo-box-${index}`).addClass('main-photo');
-            $(`#photo-box-${index}`).prepend('<div class="main-photo-badge">Main Photo</div>');
+            $(`#photo-box-${index}`).prepend('<div class="main-photo-badge">Главное фото</div>');
             $(`#id_images-${index}-is_primary`).val('True');
             
             console.log(`Set photo ${index} as main`);
@@ -714,7 +714,7 @@
             } else {
                 deleteCheckbox.prop('checked', true);
                 photoBox.addClass('marked-for-deletion');
-                photoBox.append('<div class="delete-badge">Will be deleted</div>');
+                photoBox.append('<div class="delete-badge">Будет удалено</div>');
                 
                 // If this is the primary photo, we need to set another one as primary
                 if (photoBox.hasClass('main-photo')) {
@@ -773,7 +773,7 @@
             
             if (!brandName) {
                 $('#new-brand-name').addClass('is-invalid');
-                $('#brand-error-feedback').text('Brand name is required');
+                $('#brand-error-feedback').text('Название марки обязательно');
                 return;
             }
             
@@ -802,7 +802,7 @@
                 },
                 error: function() {
                     $('#new-brand-name').addClass('is-invalid');
-                    $('#brand-error-feedback').text('An error occurred. Please try again.');
+                    $('#brand-error-feedback').text('Произошла ошибка. Пожалуйста, попробуйте снова.');
                 }
             });
         });
@@ -821,7 +821,7 @@
             
             if (!modelName) {
                 $('#new-model-name').addClass('is-invalid');
-                $('#model-error-feedback').text('Model name is required');
+                $('#model-error-feedback').text('Название модели обязательно');
                 return;
             }
             
@@ -851,7 +851,7 @@
                 },
                 error: function() {
                     $('#new-model-name').addClass('is-invalid');
-                    $('#model-error-feedback').text('An error occurred. Please try again.');
+                    $('#model-error-feedback').text('Произошла ошибка. Пожалуйста, попробуйте снова.');
                 }
             });
         });

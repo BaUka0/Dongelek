@@ -142,7 +142,7 @@
 {% block content %}
 <nav aria-label="breadcrumb" class="mb-4">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{% url 'car_list' %}">Cars</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'car_list' %}">Автомобили</a></li>
         <li class="breadcrumb-item"><a href="{% url 'car_list' %}?brand={{ car.brand.id }}">{{ car.brand }}</a></li>
         <li class="breadcrumb-item active">{{ car.model }} ({{ car.year }})</li>
     </ol>
@@ -158,7 +158,7 @@
                     </div>
                 {% empty %}
                     <div>
-                        <img src="{% static 'cars/images/placeholder.jpg' %}" alt="No image available" class="car-image-large img-fluid rounded">
+                        <img src="{% static 'cars/images/placeholder.jpg' %}" alt="Нет изображения" class="car-image-large img-fluid rounded">
                     </div>
                 {% endfor %}
             </div>
@@ -170,7 +170,7 @@
                     </div>
                 {% empty %}
                     <div>
-                        <img src="{% static 'cars/images/placeholder.jpg' %}" alt="No image available" class="img-fluid rounded">
+                        <img src="{% static 'cars/images/placeholder.jpg' %}" alt="Нет изображения" class="img-fluid rounded">
                     </div>
                 {% endfor %}
             </div>
@@ -183,17 +183,17 @@
                 {% if user.is_authenticated and user.is_buyer and user != car.seller %}
                 <div class="action-buttons">
                     <div class="tooltip-wrapper">
-                        <button class="icon-btn {% if is_favorite %}favorited{% endif %} favorite-btn" data-car-id="{{ car.id }}" aria-label="Add to favorites">
+                        <button class="icon-btn {% if is_favorite %}favorited{% endif %} favorite-btn" data-car-id="{{ car.id }}" aria-label="Добавить в избранное">
                             <i class="{% if is_favorite %}fas{% else %}far{% endif %} fa-heart"></i>
                         </button>
-                        <span class="tooltip-text">{% if is_favorite %}Remove from favorites{% else %}Add to favorites{% endif %}</span>
+                        <span class="tooltip-text">{% if is_favorite %}Удалить из избранного{% else %}Добавить в избранное{% endif %}</span>
                     </div>
                     
                     <div class="tooltip-wrapper">
-                        <a href="{% url 'add_to_compare' car.id %}?next={{ request.get_full_path|urlencode }}" class="icon-btn {% if car.in_comparison %}compared{% endif %}" aria-label="Add to comparison">
+                        <a href="{% url 'add_to_compare' car.id %}?next={{ request.get_full_path|urlencode }}" class="icon-btn {% if car.in_comparison %}compared{% endif %}" aria-label="Добавить к сравнению">
                             <i class="fas fa-balance-scale"></i>
                         </a>
-                        <span class="tooltip-text">Compare</span>
+                        <span class="tooltip-text">Сравнить</span>
                     </div>
                 </div>
                 {% endif %}
@@ -202,25 +202,25 @@
         </div>
         
         <div class="detail-section">
-            <h3 class="mb-3">Car Details</h3>
+            <h3 class="mb-3">Характеристики автомобиля</h3>
             <div class="row">
                 <div class="col-md-6">
                     <table class="table">
                         <tbody>
                             <tr>
-                                <th scope="row">Year</th>
+                                <th scope="row">Год выпуска</th>
                                 <td>{{ car.year }}</td>
                             </tr>
                             <tr>
-                                <th scope="row">Mileage</th>
-                                <td>{{ car.mileage }} km</td>
+                                <th scope="row">Пробег</th>
+                                <td>{{ car.mileage }} км</td>
                             </tr>
                             <tr>
-                                <th scope="row">Fuel Type</th>
+                                <th scope="row">Тип топлива</th>
                                 <td>{{ car.get_fuel_type_display }}</td>
                             </tr>
                             <tr>
-                                <th scope="row">Transmission</th>
+                                <th scope="row">Коробка передач</th>
                                 <td>{{ car.get_transmission_display }}</td>
                             </tr>
                         </tbody>
@@ -230,20 +230,20 @@
                     <table class="table">
                         <tbody>
                             <tr>
-                                <th scope="row">Body Type</th>
+                                <th scope="row">Тип кузова</th>
                                 <td>{{ car.get_body_type_display }}</td>
                             </tr>
                             <tr>
-                                <th scope="row">Drive Type</th>
+                                <th scope="row">Привод</th>
                                 <td>{{ car.get_drive_type_display }}</td>
                             </tr>
                             <tr>
-                                <th scope="row">Color</th>
+                                <th scope="row">Цвет</th>
                                 <td>{{ car.color }}</td>
                             </tr>
                             <tr>
-                                <th scope="row">Engine Size</th>
-                                <td>{% if car.engine_size %}{{ car.engine_size }} L{% else %}-{% endif %}</td>
+                                <th scope="row">Объем двигателя</th>
+                                <td>{% if car.engine_size %}{{ car.engine_size }} л{% else %}-{% endif %}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -252,7 +252,7 @@
         </div>
         
         <div class="detail-section">
-            <h3 class="mb-3">Description</h3>
+            <h3 class="mb-3">Описание</h3>
             <div class="card">
                 <div class="card-body">
                     {{ car.description|linebreaks }}
@@ -261,14 +261,14 @@
         </div>
         
         <div class="detail-section">
-            <h3 class="mb-3">Location</h3>
+            <h3 class="mb-3">Местоположение</h3>
             <p><i class="fas fa-map-marker-alt me-2"></i> {{ car.city }}, {{ car.region }}</p>
         </div>
     </div>
     
     <div class="col-lg-4">
         <div class="seller-info mb-4">
-            <h4 class="mb-3">Seller Information</h4>
+            <h4 class="mb-3">Информация о продавце</h4>
             <div class="d-flex align-items-center mb-3">
                 <div class="me-3">
                     <i class="fas fa-user-circle fa-3x text-secondary"></i>
@@ -280,10 +280,10 @@
                             {{ car.seller.get_full_name|default:car.seller.username }}
                         </a>
                         {% else %}
-                        {{ car.seller.get_full_name|default:"Anonymous" }}
+                        {{ car.seller.get_full_name|default:"Анонимно" }}
                         {% endif %}
                     </h5>
-                    <p class="text-muted mb-0">Member since {{ car.seller.date_joined|date:"F Y" }}</p>
+                    <p class="text-muted mb-0">Участник с {{ car.seller.date_joined|date:"F Y" }}</p>
                     
                     {% if avg_seller_rating %}
                     <div class="d-flex align-items-center mt-1">
@@ -298,11 +298,11 @@
                                 {% endif %}
                             {% endfor %}
                         </div>
-                        <span>{{ avg_seller_rating|floatformat:1 }} <small class="text-muted">({{ seller_review_count }} reviews)</small></span>
+                        <span>{{ avg_seller_rating|floatformat:1 }} <small class="text-muted">({{ seller_review_count }} отзывов)</small></span>
                     </div>
                     {% else %}
                     <div class="mt-1">
-                        <small class="text-muted">No reviews yet</small>
+                        <small class="text-muted">Отзывов пока нет</small>
                     </div>
                     {% endif %}
                 </div>
@@ -313,22 +313,22 @@
             <div class="d-grid gap-2">
                 {% if user.is_authenticated and user != car.seller %}
                 <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#contactModal">
-                    <i class="fas fa-comment me-2"></i> Contact Seller
+                    <i class="fas fa-comment me-2"></i> Связаться с продавцом
                 </a>
                 <a href="tel:+7XXXXXXXXXX" class="btn btn-outline-primary">
-                    <i class="fas fa-phone-alt me-2"></i> Call Seller
+                    <i class="fas fa-phone-alt me-2"></i> Позвонить продавцу
                 </a>
                 {% if user.is_buyer %}
                 <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#reviewSellerModal">
-                    <i class="fas fa-star me-2"></i> Rate Seller
+                    <i class="fas fa-star me-2"></i> Оценить продавца
                 </button>
                 {% endif %}
                 {% else %}
                 <div class="alert alert-info mb-0">
-                    <p class="mb-2"><i class="fas fa-info-circle me-2"></i> You need to be logged in to contact the seller.</p>
+                    <p class="mb-2"><i class="fas fa-info-circle me-2"></i> Вам необходимо войти в систему, чтобы связаться с продавцом.</p>
                     <div class="d-flex gap-2">
-                        <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-sm btn-primary">Login</a>
-                        <a href="{% url 'signup' %}?next={{ request.path }}" class="btn btn-sm btn-outline-primary">Register</a>
+                        <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-sm btn-primary">Вход</a>
+                        <a href="{% url 'signup' %}?next={{ request.path }}" class="btn btn-sm btn-outline-primary">Регистрация</a>
                     </div>
                 </div>
                 {% endif %}
@@ -337,19 +337,19 @@
             <hr>
             
             <div class="d-flex justify-content-between text-muted">
-                <small>Posted: {{ car.created_at|date:"d.m.Y" }}</small>
-                <small>Views: {{ car.views_count }}</small>
+                <small>Опубликовано: {{ car.created_at|date:"d.m.Y" }}</small>
+                <small>Просмотров: {{ car.views_count }}</small>
             </div>
             
             {% if seller_reviews %}
             <hr>
             <div>
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="mb-0">Recent Seller Reviews</h6>
+                    <h6 class="mb-0">Последние отзывы о продавце</h6>
                     <div>
-                        <a href="#sellerReviews" class="text-decoration-none small me-2">View on Page</a>
+                        <a href="#sellerReviews" class="text-decoration-none small me-2">Смотреть на странице</a>
                         {% if car.seller.username %}
-                        <a href="{% url 'profile_detail' username=car.seller.username %}#reviews" class="text-decoration-none small">View Profile</a>
+                        <a href="{% url 'profile_detail' username=car.seller.username %}#reviews" class="text-decoration-none small">Смотреть профиль</a>
                         {% endif %}
                     </div>
                 </div>
@@ -366,7 +366,7 @@
                                 {% endif %}
                             {% endfor %}
                             {% if review.is_verified %}
-                                <span class="badge bg-success ms-1">Verified</span>
+                                <span class="badge bg-success ms-1">Проверено</span>
                             {% endif %}
                         </div>
                         <p class="mb-1 small">{{ review.comment|truncatechars:100 }}</p>
@@ -393,11 +393,11 @@
             <div class="mb-4">
                 <div class="d-grid gap-2">
                     <a href="{% url 'car_update' car.slug %}" class="btn btn-secondary">
-                        <i class="fas fa-edit me-2"></i> Edit Listing
+                        <i class="fas fa-edit me-2"></i> Редактировать объявление
                     </a>
-                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal">
-                        <i class="fas fa-trash-alt me-2"></i> Delete Listing
-                    </button>
+                    <a href="{% url 'car_delete' car.slug %}" class="btn btn-danger">
+                        <i class="fas fa-trash-alt me-2"></i> Удалить объявление
+                    </a>
                 </div>
             </div>
         {% endif %}
@@ -405,7 +405,7 @@
         {% if similar_cars %}
             <div class="card">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">Similar Cars</h5>
+                    <h5 class="card-title mb-0">Похожие автомобили</h5>
                 </div>
                 <div class="card-body">
                     <div class="row g-3">
@@ -417,7 +417,7 @@
                                             {% if main_image %}
                                                 <img src="{{ main_image.image.url }}" style="width: 80px; height: 60px; object-fit: cover;" class="rounded" alt="{{ similar_car }}">
                                             {% else %}
-                                                <img src="{% static 'cars/images/placeholder.jpg' %}" style="width: 80px; height: 60px; object-fit: cover;" class="rounded" alt="No image">
+                                                <img src="{% static 'cars/images/placeholder.jpg' %}" style="width: 80px; height: 60px; object-fit: cover;" class="rounded" alt="Нет фото">
                                             {% endif %}
                                         {% endwith %}
                                     </a>
@@ -437,29 +437,11 @@
     </div>
 </div>
 
-<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteConfirmModalLabel">Confirm Deletion</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Are you sure you want to delete this listing? This action cannot be undone.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <a href="{% url 'car_delete' car.slug %}" class="btn btn-danger">Delete</a>
-            </div>
-        </div>
-    </div>
-</div>
-
 <div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="contactModalLabel">Contact Seller</h5>
+                <h5 class="modal-title" id="contactModalLabel">Связаться с продавцом</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -467,18 +449,18 @@
                     <form id="messageForm" action="{% url 'start_conversation' car.id %}" method="post">
                         {% csrf_token %}
                         <div class="mb-3">
-                            <label for="content" class="form-label">Your Message</label>
-                            <textarea class="form-control" id="content" name="content" rows="5" placeholder="Hi, I'm interested in your {{ car.brand }} {{ car.model }}..." required></textarea>
+                            <label for="content" class="form-label">Ваше сообщение</label>
+                            <textarea class="form-control" id="content" name="content" rows="5" placeholder="Здравствуйте, я заинтересован в вашем {{ car.brand }} {{ car.model }}..." required></textarea>
                         </div>
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-primary" id="sendMessageBtn">Send Message</button>
+                            <button type="submit" class="btn btn-primary" id="sendMessageBtn">Отправить сообщение</button>
                         </div>
                     </form>
                 {% else %}
                     <div class="text-center py-4">
-                        <p>You need to log in to contact the seller.</p>
-                        <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-primary">Log In</a>
-                        <a href="{% url 'signup' %}?next={{ request.path }}" class="btn btn-outline-primary">Register</a>
+                        <p>Вам необходимо войти в систему, чтобы связаться с продавцом.</p>
+                        <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-primary">Вход</a>
+                        <a href="{% url 'signup' %}?next={{ request.path }}" class="btn btn-outline-primary">Регистрация</a>
                     </div>
                 {% endif %}
             </div>
@@ -490,14 +472,14 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="reviewSellerModalLabel">Rate & Review Seller</h5>
+                <h5 class="modal-title" id="reviewSellerModalLabel">Оценить продавца</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 {% if user.is_authenticated and user != car.seller %}
                     {% if user_review %}
                         <div class="alert alert-info">
-                            <strong>You've already reviewed this seller.</strong> You can update your review below.
+                            <strong>Вы уже оставляли отзыв об этом продавце.</strong> Вы можете обновить свой отзыв ниже.
                         </div>
                     {% endif %}
                     
@@ -507,7 +489,7 @@
                         <input type="hidden" name="next" value="{{ request.path }}">
                         
                         <div class="mb-3">
-                            <label for="id_rating" class="form-label">Rating</label>
+                            <label for="id_rating" class="form-label">Оценка</label>
                             <select name="rating" id="id_rating" class="form-select" required>
                                 {% for value, text in seller_review_form.fields.rating.choices %}
                                     <option value="{{ value }}" {% if user_review and user_review.rating == value %}selected{% endif %}>{{ text }}</option>
@@ -516,14 +498,14 @@
                         </div>
                         
                         <div class="mb-3">
-                            <label for="id_comment" class="form-label">Comment</label>
-                            <textarea name="comment" id="id_comment" class="form-control" rows="4" placeholder="Share your experience with this seller..." required>{% if user_review %}{{ user_review.comment }}{% endif %}</textarea>
+                            <label for="id_comment" class="form-label">Комментарий</label>
+                            <textarea name="comment" id="id_comment" class="form-control" rows="4" placeholder="Поделитесь своим опытом с этим продавцом..." required>{% if user_review %}{{ user_review.comment }}{% endif %}</textarea>
                         </div>
                         
                         <div class="d-flex justify-content-between">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
                             <button type="submit" class="btn btn-primary">
-                                {% if user_review %}Update{% else %}Submit{% endif %} Review
+                                {% if user_review %}Обновить{% else %}Отправить{% endif %} отзыв
                             </button>
                         </div>
                         
@@ -531,15 +513,15 @@
                         <hr>
                         <div class="text-end">
                             <a href="{% url 'delete_seller_review' user_review.id %}?next={{ request.path|urlencode }}" class="btn btn-sm btn-outline-danger">
-                                <i class="fas fa-trash-alt"></i> Delete Review
+                                <i class="fas fa-trash-alt"></i> Удалить отзыв
                             </a>
                         </div>
                         {% endif %}
                     </form>
                 {% else %}
                     <div class="text-center py-4">
-                        <p>You need to log in to review this seller.</p>
-                        <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-primary">Log In</a>
+                        <p>Вам необходимо войти в систему, чтобы оценить продавца.</p>
+                        <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-primary">Вход</a>
                     </div>
                 {% endif %}
             </div>
@@ -549,11 +531,11 @@
 
 <div id="sellerReviews" class="mt-5">
     <h4>
-        Seller Reviews 
+        Отзывы о продавце 
         {% if car.seller.username %}
         <small class="fs-6">
             <a href="{% url 'profile_detail' username=car.seller.username %}" class="text-decoration-none">
-                View Seller Profile <i class="fas fa-external-link-alt"></i>
+                Посмотреть профиль продавца <i class="fas fa-external-link-alt"></i>
             </a>
         </small>
         {% endif %}
@@ -588,13 +570,13 @@
                                             {% endif %}
                                         {% endfor %}
                                         {% if review.is_verified %}
-                                            <span class="badge bg-success ms-2">Verified</span>
+                                            <span class="badge bg-success ms-2">Проверено</span>
                                         {% endif %}
                                     </div>
                                 </div>
-                                <small class="text-muted">{{ review.created_at|date:"F d, Y" }}
+                                <small class="text-muted">{{ review.created_at|date:"d F Y" }}
                                     {% if review.is_edited %}
-                                    (edited)
+                                    (отредактировано)
                                     {% endif %}
                                 </small>
                             </div>
@@ -606,7 +588,7 @@
         </div>
     {% else %}
         <div class="alert alert-light text-center">
-            <p class="mb-0">No reviews yet for this seller.</p>
+            <p class="mb-0">Пока нет отзывов об этом продавце.</p>
         </div>
     {% endif %}
 </div>
@@ -646,7 +628,7 @@
             const content = $('#content').val().trim();
             
             if (!content) {
-                alert('Please enter a message.');
+                alert('Пожалуйста, введите сообщение.');
                 return;
             }
             
@@ -659,11 +641,11 @@
                 },
                 success: function(response) {
                     $('#contactModal').modal('hide');
-                    alert('Your message has been sent! You will be redirected to the conversation.');
+                    alert('Ваше сообщение отправлено! Вы будете перенаправлены в диалог.');
                     window.location.href = "{% url 'inbox' %}";
                 },
                 error: function() {
-                    alert('There was an error sending your message. Please try again.');
+                    alert('При отправке сообщения произошла ошибка. Пожалуйста, попробуйте снова.');
                 }
             });
         });
@@ -682,15 +664,15 @@
                     if (response.is_favorite) {
                         button.addClass('favorited');
                         button.find('i').removeClass('far').addClass('fas');
-                        button.next('.tooltip-text').text('Remove from favorites');
+                        button.next('.tooltip-text').text('Удалить из избранного');
                     } else {
                         button.removeClass('favorited');
                         button.find('i').removeClass('fas').addClass('far');
-                        button.next('.tooltip-text').text('Add to favorites');
+                        button.next('.tooltip-text').text('Добавить в избранное');
                     }
                 },
                 error: function() {
-                    alert('There was an error updating your favorites. Please try again.');
+                    alert('При обновлении избранного произошла ошибка. Пожалуйста, попробуйте снова.');
                 }
             });
         });

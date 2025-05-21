@@ -7,11 +7,28 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+        
         body {
             font-family: 'Roboto', sans-serif;
             background-color: #f8f9fa;
             transition: background-color 0.3s ease, color 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
+        
+        main {
+            flex: 1 0 auto; /* This makes the main content area grow */
+        }
+        
+        footer {
+            flex-shrink: 0; /* This prevents the footer from shrinking */
+        }
+        
         .navbar {
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
@@ -68,7 +85,55 @@
             border-radius: 0.25rem;
         }
         .btn {
+            font-weight: 500;
+            padding: 0.375rem 0.75rem;
             border-radius: 0.25rem;
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .btn-primary {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+            border-color: #0a58ca;
+        }
+        
+        .btn-outline-primary {
+            color: #0d6efd;
+            border-color: #0d6efd;
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: #0d6efd;
+            color: white;
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+        
+        .btn-danger:hover {
+            background-color: #bb2d3b;
+            border-color: #b02a37;
+        }
+        
+        .btn-outline-danger {
+            color: #dc3545;
+            border-color: #dc3545;
+        }
+        
+        .btn-outline-danger:hover {
+            background-color: #dc3545;
+            color: white;
         }
         
         /* Dark theme styles */
@@ -400,27 +465,37 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link" href="/">Home</a>
+                        <a class="nav-link" href="/"><i class="fas fa-home"></i> Главная</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'car_list' %}">Cars</a>
+                        <a class="nav-link" href="{% url 'car_list' %}"><i class="fas fa-car"></i> Автомобили</a>
                     </li>
                     {% if user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'car_create' %}">Sell a Car</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'favorite_list' %}">Favorites</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link position-relative" href="{% url 'compare_list' %}">
-                            <i class="fas fa-balance-scale"></i> Compare
-                            <span id="compare-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary" style="display: none;">
-                                <span id="compare-count">0</span>
-                                <span class="visually-hidden">cars to compare</span>
-                            </span>
-                        </a>
-                    </li>
+                    {% if user.is_seller %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'car_create' %}"><i class="fas fa-tag"></i> Продать автомобиль</a>
+                        </li>
+                    {% endif %}
+                        {% if user.is_buyer %}
+                            <li class="nav-item">
+                                <a class="nav-link position-relative" href="{% url 'favorite_list' %}">
+                                    <i class="fas fa-heart"></i> Избранное
+                                    <span id="favorites-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none;">
+                                        <span id="favorites-count">0</span>
+                                        <span class="visually-hidden">избранных</span>
+                                    </span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link position-relative" href="{% url 'compare_list' %}">
+                                    <i class="fas fa-balance-scale"></i> Сравнение
+                                    <span id="compare-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary" style="display: none;">
+                                        <span id="compare-count">0</span>
+                                        <span class="visually-hidden">автомобилей для сравнения</span>
+                                    </span>
+                                </a>
+                            </li>
+                        {% endif %}
                     {% endif %}
                 </ul>
                 <ul class="navbar-nav">
@@ -437,37 +512,39 @@
                     {% if user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link position-relative" href="{% url 'inbox' %}">
-                            <i class="fas fa-inbox"></i> Messages
+                            <i class="fas fa-inbox"></i> Сообщения
                             <span id="unread-message-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none;">
                                 <span id="unread-message-count">0</span>
-                                <span class="visually-hidden">unread messages</span>
+                                <span class="visually-hidden">непрочитанных</span>
                             </span>
                         </a>
                     </li>
                     <li id="notification-status" class="nav-item d-none">
                         <span class="nav-link text-warning">
-                            <i class="fas fa-exclamation-triangle"></i> Notifications offline
+                            <i class="fas fa-exclamation-triangle"></i> Офлайн
                         </span>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
                             {% if user.avatar %}
-                                <img src="{{ user.avatar.url }}" alt="Avatar" class="rounded-circle" style="width: 25px; height: 25px; object-fit: cover;">
+                                <img src="{{ user.avatar.url }}" alt="Аватар" class="rounded-circle" style="width: 25px; height: 25px; object-fit: cover;">
+                            {% else %}
+                                <i class="fas fa-user-circle"></i>
                             {% endif %}
                             {{ user.username }}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="{% url 'profile' %}">Profile</a></li>
+                            <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-user"></i> Профиль</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Выйти</a></li>
                         </ul>
                     </li>
                     {% else %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'login' %}">Login</a>
+                        <a class="nav-link" href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Войти</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'signup' %}">Register</a>
+                        <a class="nav-link" href="{% url 'signup' %}"><i class="fas fa-user-plus"></i> Зарегистрироваться</a>
                     </li>
                     {% endif %}
                 </ul>
@@ -490,7 +567,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <h5>Dongelek Car Marketplace</h5>
-                    <p class="text-muted">The best place to buy and sell cars in Kazakhstan</p>
+                    <p class="text-muted">Лучшее место для покупки и продажи автомобилей в Казахстане</p>
                 </div>
             </div>
             <hr>
@@ -538,11 +615,18 @@
                 const btn = $(this);
                 const carId = btn.data('car-id');
 
+                // Get the CSRF token
+                const csrftoken = getCookie('csrftoken');
+
                 $.ajax({
-                    url: `/cars/favorite/${carId}/`,
+                    url: `/cars/favorite/${carId}/`,  // Updated URL to match urls.py
                     type: 'POST',
                     headers: {
-                        'X-CSRFToken': getCookie('csrftoken')
+                        'X-CSRFToken': csrftoken
+                    },
+                    dataType: 'json',
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
                     },
                     success: function(data) {
                         if (data.is_favorite) {
@@ -551,7 +635,7 @@
                             if (btn.hasClass('btn')) {
                                 btn.removeClass('btn-outline-danger').addClass('btn-danger');
                                 if (btn.find('span').length > 0) {
-                                    btn.find('span').text('Remove from Favorites');
+                                    btn.find('span').text('Удалить из избранного');
                                 }
                             }
                         } else {
@@ -560,7 +644,7 @@
                             if (btn.hasClass('btn')) {
                                 btn.removeClass('btn-danger').addClass('btn-outline-danger');
                                 if (btn.find('span').length > 0) {
-                                    btn.find('span').text('Add to Favorites');
+                                    btn.find('span').text('Добавить в избранное');
                                 }
                             }
                         }
@@ -575,15 +659,30 @@
                                 }
                             });
                         }
+                        
+                        // Update favorites count after toggling
+                        updateFavoritesCount();
                     },
                     error: function(xhr, status, error) {
-                        console.error("Error toggling favorite:", error);
-                        console.log("Status:", xhr.status);
-                        console.log("Response:", xhr.responseText);
-                        alert("Could not update favorites. Please try again.");
+                        if (xhr.status === 403) {
+                            // User is not authenticated
+                            window.location.href = "{% url 'login' %}?next=" + window.location.pathname;
+                        } else if (xhr.responseJSON && xhr.responseJSON.error) {
+                            // Show server error message if available
+                            console.error("Server error:", xhr.responseJSON.error);
+                        } else {
+                            console.error("Error toggling favorite:", error);
+                            console.log("Status:", xhr.status);
+                            console.log("Response:", xhr.responseText);
+                        }
                     }
                 });
             });
+            
+            // Update favorites count when page loads
+            if ($("#favorites-badge").length) {
+                updateFavoritesCount();
+            }
         });
         
         // Function to get CSRF token from cookies
@@ -633,6 +732,38 @@
                 },
                 error: function() {
                     console.log("Error fetching compare count");
+                }
+            });
+        }
+        
+        // Function to update favorites count
+        function updateFavoritesCount() {
+            $.ajax({
+                url: "{% url 'favorite_list' %}",
+                type: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                success: function(data) {
+                    // Count the number of favorites
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(data, 'text/html');
+                    const favoriteCards = doc.querySelectorAll('.col');
+                    const favoritesCount = favoriteCards.length;
+                    
+                    // Update the badge
+                    const badge = document.getElementById('favorites-badge');
+                    const count = document.getElementById('favorites-count');
+                    
+                    if (favoritesCount > 0) {
+                        count.textContent = favoritesCount;
+                        badge.style.display = 'block';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                },
+                error: function() {
+                    console.log("Error fetching favorites count");
                 }
             });
         }

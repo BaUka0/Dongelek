@@ -1,15 +1,15 @@
 {% extends 'base.html' %}
 
-{% block title %}Chat History - Dongelek{% endblock %}
+{% block title %}История чата - Dongelek{% endblock %}
 
 {% block content %}
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Your Chat History</h1>
+        <h1>Ваша история чата</h1>
         {% if user_sessions %}
         <div>
             <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#clearHistoryModal">
-                <i class="fas fa-trash"></i> Clear All History
+                <i class="fas fa-trash"></i> Очистить всю историю
             </button>
         </div>
         {% endif %}
@@ -23,10 +23,10 @@
                     <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                         <a href="#session-{{ session.id }}" data-bs-toggle="list" class="flex-grow-1 text-decoration-none text-dark">
                             <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">Session {{ forloop.counter }}</h6>
+                                <h6 class="mb-1">Сессия {{ forloop.counter }}</h6>
                                 <small>{{ session.created_at|date:"d.m.Y" }}</small>
                             </div>
-                            <small class="text-muted">{{ session.messages.count }} messages</small>
+                            <small class="text-muted">{{ session.messages.count }} сообщений</small>
                         </a>
                         <button class="btn btn-sm btn-danger ms-2 delete-session-btn" data-bs-toggle="modal" data-bs-target="#deleteSessionModal" data-session-id="{{ session.session_id }}">
                             <i class="fas fa-trash"></i>
@@ -42,8 +42,8 @@
                     <div class="tab-pane fade {% if forloop.first %}show active{% endif %}" id="session-{{ session.id }}">
                         <div class="card">
                             <div class="card-header d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0">Session from {{ session.created_at|date:"d.m.Y H:i" }}</h5>
-                                <small class="text-muted">{{ session.messages.count }} messages</small>
+                                <h5 class="mb-0">Сессия от {{ session.created_at|date:"d.m.Y H:i" }}</h5>
+                                <small class="text-muted">{{ session.messages.count }} сообщений</small>
                             </div>
                             <div class="card-body">
                                 <div class="chatbot-messages history-messages">
@@ -51,7 +51,7 @@
                                     <div class="message user-message">
                                         <div class="message-content">
                                             <div class="message-header">
-                                                <small class="text-muted">You - {{ message.created_at|date:"H:i" }}</small>
+                                                <small class="text-muted">Вы - {{ message.created_at|date:"H:i" }}</small>
                                             </div>
                                             <p>{{ message.user_message }}</p>
                                         </div>
@@ -59,7 +59,7 @@
                                     <div class="message bot-message">
                                         <div class="message-content">
                                             <div class="message-header">
-                                                <small class="text-muted">Dongelek Assistant - {{ message.created_at|date:"H:i" }}</small>
+                                                <small class="text-muted">Dongelek Ассистент - {{ message.created_at|date:"H:i" }}</small>
                                             </div>
                                             <p>{{ message.bot_response }}</p>
                                         </div>
@@ -75,8 +75,8 @@
         </div>
     {% else %}
         <div class="alert alert-info">
-            <p>You haven't had any conversations with our chatbot yet.</p>
-            <p>Try asking the chatbot for help by clicking the chat button in the bottom right corner of any page.</p>
+            <p>У вас еще не было разговоров с нашим чат-ботом.</p>
+            <p>Попробуйте задать вопрос чат-боту, нажав на кнопку чата в правом нижнем углу любой страницы.</p>
         </div>
     {% endif %}
 </div>
@@ -86,15 +86,15 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Delete Chat Session</h5>
+                <h5 class="modal-title">Удалить сессию чата</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Are you sure you want to delete this chat session? This action cannot be undone.</p>
+                <p>Вы уверены, что хотите удалить эту сессию чата? Это действие нельзя отменить.</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <a href="#" id="delete-session-link" class="btn btn-danger">Delete Session</a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <a href="#" id="delete-session-link" class="btn btn-danger">Удалить сессию</a>
             </div>
         </div>
     </div>
@@ -105,16 +105,16 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Clear All Chat History</h5>
+                <h5 class="modal-title">Очистить всю историю чата</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Are you sure you want to clear all your chat history? This will delete all of your conversations with the chatbot.</p>
-                <p class="text-danger"><strong>This action cannot be undone.</strong></p>
+                <p>Вы уверены, что хотите очистить всю историю чата? Это удалит все ваши разговоры с чат-ботом.</p>
+                <p class="text-danger"><strong>Это действие нельзя отменить.</strong></p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <a href="{% url 'clear_chat_history' %}" class="btn btn-danger">Clear All History</a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <a href="{% url 'clear_chat_history' %}" class="btn btn-danger">Очистить всю историю</a>
             </div>
         </div>
     </div>
@@ -162,6 +162,44 @@
     
     .list-group-item:hover .delete-session-btn {
         opacity: 1;
+    }
+    
+    /* Dark theme styles */
+    [data-bs-theme="dark"] .user-message .message-content {
+        background-color: #0d4588;
+        color: #f8f9fa;
+    }
+    
+    [data-bs-theme="dark"] .bot-message .message-content {
+        background-color: #495057;
+        color: #f8f9fa;
+    }
+    
+    [data-bs-theme="dark"] .message-header small.text-muted {
+        color: #adb5bd !important;
+    }
+    
+    [data-bs-theme="dark"] a.text-decoration-none.text-dark {
+        color: #f8f9fa !important;
+    }
+    
+    [data-bs-theme="dark"] .list-group-item {
+        background-color: #343a40;
+        border-color: #495057;
+    }
+    
+    [data-bs-theme="dark"] .list-group-item:hover {
+        background-color: #495057;
+    }
+    
+    [data-bs-theme="dark"] .card {
+        background-color: #343a40;
+        border-color: #495057;
+    }
+    
+    [data-bs-theme="dark"] .card-header {
+        background-color: #212529;
+        border-bottom-color: #495057;
     }
 </style>
 {% endblock %}

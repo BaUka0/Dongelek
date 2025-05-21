@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}My Messages - Dongelek{% endblock %}
+{% block title %}Мои сообщения - Dongelek{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -36,14 +36,14 @@
 {% endblock %}
 
 {% block content %}
-<h1 class="mb-4">My Messages</h1>
+<h1 class="mb-4">Мои сообщения</h1>
 
 {% if conversations %}
     <div class="row">
         <div class="col-lg-4">
             <div class="card mb-4">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Conversations</h5>
+                    <h5 class="mb-0">Переписки</h5>
                 </div>
                 <div class="list-group list-group-flush conversation-list">
                     {% for conversation in conversations %}
@@ -66,12 +66,12 @@
                                     {% with last_message=conversation.messages.last %}
                                         {% if last_message %}
                                             {% if last_message.sender == request.user %}
-                                                You: {{ last_message.content }}
+                                                Вы: {{ last_message.content }}
                                             {% else %}
                                                 {{ last_message.content }}
                                             {% endif %}
                                         {% else %}
-                                            No messages yet
+                                            Нет сообщений
                                         {% endif %}
                                     {% endwith %}
                                 </span>
@@ -96,8 +96,8 @@
                 <div class="card">
                     <div class="card-body text-center py-5">
                         <i class="fas fa-comments fa-5x text-muted mb-3"></i>
-                        <h4>Select a conversation</h4>
-                        <p class="text-muted">Choose a conversation from the list to view messages</p>
+                        <h4>Выберите переписку</h4>
+                        <p class="text-muted">Выберите переписку из списка, чтобы просмотреть сообщения</p>
                     </div>
                 </div>
             {% endif %}
@@ -107,9 +107,9 @@
     <div class="card">
         <div class="card-body text-center py-5">
             <i class="fas fa-comment-slash fa-5x text-muted mb-3"></i>
-            <h4>No conversations yet</h4>
-            <p class="text-muted">When you start a conversation with a car seller, it will appear here</p>
-            <a href="{% url 'car_list' %}" class="btn btn-primary mt-3">Browse Cars</a>
+            <h4>Пока нет переписок</h4>
+            <p class="text-muted">Когда вы начнете переписку с продавцом автомобиля, она появится здесь</p>
+            <a href="{% url 'car_list' %}" class="btn btn-primary mt-3">Просмотр автомобилей</a>
         </div>
     </div>
 {% endif %}

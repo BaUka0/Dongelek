@@ -1,11 +1,94 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}My Favorites - Dongelek{% endblock %}
+{% block title %}Избранные автомобили - Dongelek{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Action buttons styling - matching car_detail.html */
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .icon-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        border: none;
+        background-color: #f8f9fa;
+        color: #212529;
+        font-size: 16px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    
+    .icon-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .icon-btn.favorited {
+        background-color: #ffebee;
+        color: #e53935;
+    }
+    
+    .icon-btn.compared {
+        background-color: #e3f2fd;
+        color: #1976d2;
+    }
+    
+    [data-bs-theme="dark"] .icon-btn {
+        background-color: #343a40;
+        color: #f8f9fa;
+    }
+    
+    [data-bs-theme="dark"] .icon-btn:hover {
+        background-color: #495057;
+    }
+    
+    [data-bs-theme="dark"] .icon-btn.favorited {
+        background-color: #4a2429;
+        color: #ef9a9a;
+    }
+    
+    [data-bs-theme="dark"] .icon-btn.compared {
+        background-color: #1c313a;
+        color: #90caf9;
+    }
+    
+    /* Card footer for displaying price and actions */
+    .card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        background-color: transparent;
+    }
+    
+    .car-image {
+        height: 180px;
+        object-fit: cover;
+    }
+    
+    /* Dark mode support */
+    [data-bs-theme="dark"] .card {
+        background-color: #343a40;
+        border-color: #495057;
+    }
+    
+    [data-bs-theme="dark"] .text-dark {
+        color: #f8f9fa !important;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="container">
-    <h2 class="mb-4">My Favorite Cars</h2>
+    <h2 class="mb-4">Мои избранные автомобили</h2>
     
     {% if favorites %}
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
@@ -17,34 +100,42 @@
                                 {% if main_image %}
                                     <img src="{{ main_image.image.url }}" class="card-img-top car-image" alt="{{ favorite.car }}">
                                 {% else %}
-                                    <img src="{% static 'cars/images/placeholder.jpg' %}" class="card-img-top car-image" alt="No image available">
+                                    <img src="{% static 'cars/images/placeholder.jpg' %}" class="card-img-top car-image" alt="Нет изображения">
                                 {% endif %}
                             {% endwith %}
                         </a>
                         
-                        <div class="card-body">
-                            <a href="{{ favorite.car.get_absolute_url }}" class="text-decoration-none text-dark">
+                        <div class="card-body pb-2">
+                            <a href="{{ favorite.car.get_absolute_url }}" class="text-decoration-none">
                                 <h5 class="card-title">{{ favorite.car.brand }} {{ favorite.car.model }}</h5>
                             </a>
-                            <h6 class="card-subtitle mb-2 text-muted">{{ favorite.car.year }} • {{ favorite.car.mileage }} km</h6>
+                            <p class="card-subtitle mb-2 text-muted">{{ favorite.car.year }} • {{ favorite.car.mileage }} км</p>
                             
-                            <!-- Price and favorite button in one row -->
-                            <div class="price-container mb-2">
-                                <p class="card-text fw-bold text-primary mb-0">{{ favorite.car.price }} ₸</p>
-                                <div class="d-flex">
-                                    <button class="favorite-btn me-2" data-car-id="{{ favorite.car.id }}">
-                                        <i class="fas fa-heart"></i>
-                                    </button>
-                                    <a href="{% url 'add_to_compare' favorite.car.id %}?next={{ request.get_full_path|urlencode }}" class="btn btn-sm btn-outline-secondary">
-                                        <i class="fas fa-balance-scale"></i> Сравнить
-                                    </a>
-                                </div>
-                            </div>
-                            
-                            <div class="d-flex justify-content-between align-items-center mt-3">
+                            <div class="d-flex justify-content-between align-items-center mt-2">
                                 <small class="text-muted">{{ favorite.car.city }}, {{ favorite.car.region }}</small>
-                                <small class="text-muted">Added: {{ favorite.created_at|date:"d.m.Y" }}</small>
+                                <small class="text-muted">Добавлено: {{ favorite.created_at|date:"d.m.Y" }}</small>
                             </div>
+                        </div>
+                        
+                        <div class="card-footer border-top-0">
+                            <div>
+                                <h6 class="mb-0 text-primary fw-bold">{{ favorite.car.price }} ₸</h6>
+                            </div>
+                            
+                            {% if user.is_authenticated and user.is_buyer and user != favorite.car.seller %}
+                            <div class="action-buttons">
+                                <button type="button" class="icon-btn favorited favorite-btn" 
+                                        data-car-id="{{ favorite.car.id }}" title="Удалить из избранного">
+                                    <i class="fas fa-heart"></i>
+                                </button>
+                                
+                                <a href="{% url 'add_to_compare' favorite.car.id %}?next={{ request.get_full_path|urlencode }}" 
+                                   class="icon-btn {% if favorite.car in compare_list %}compared{% endif %}" 
+                                   title="Сравнить">
+                                    <i class="fas fa-balance-scale"></i>
+                                </a>
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -52,20 +143,13 @@
         </div>
     {% else %}
         <div class="alert alert-info" role="alert">
-            <h4 class="alert-heading">No favorite cars yet!</h4>
-            <p>You haven't added any cars to your favorites list. Browse our car listings and click the heart icon to add cars to your favorites.</p>
+            <h4 class="alert-heading">В избранном пока нет автомобилей!</h4>
+            <p>Вы еще не добавили автомобили в избранное. Просмотрите наш каталог автомобилей и нажмите на значок сердца, чтобы добавить автомобили в избранное.</p>
             <hr>
             <div class="text-center">
-                <a href="{% url 'car_list' %}" class="btn btn-primary">Browse Cars</a>
+                <a href="{% url 'car_list' %}" class="btn btn-primary">Просмотреть автомобили</a>
             </div>
         </div>
     {% endif %}
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-    // This page-specific script now uses the global favorite button handler
-    // which is already defined in base.html
-</script>
 {% endblock %}

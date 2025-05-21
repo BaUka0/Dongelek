@@ -2,7 +2,7 @@
 {% load static %}
 {% load custom_filters %}
 
-{% block title %}Dongelek - Car Marketplace{% endblock %}
+{% block title %}Dongelek - Автомобильная площадка{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -48,6 +48,75 @@
         margin-bottom: 15px;
         color: #0d6efd;
     }
+    
+    /* Action buttons styling - matching car_detail.html */
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .icon-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        border: none;
+        background-color: #f8f9fa;
+        color: #212529;
+        font-size: 16px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    
+    .icon-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .icon-btn.favorited {
+        background-color: #ffebee;
+        color: #e53935;
+    }
+    
+    .icon-btn.compared {
+        background-color: #e3f2fd;
+        color: #1976d2;
+    }
+    
+    [data-bs-theme="dark"] .icon-btn {
+        background-color: #343a40;
+        color: #f8f9fa;
+    }
+    
+    [data-bs-theme="dark"] .icon-btn:hover {
+        background-color: #495057;
+    }
+    
+    [data-bs-theme="dark"] .icon-btn.favorited {
+        background-color: #4a2429;
+        color: #ef9a9a;
+    }
+    
+    [data-bs-theme="dark"] .icon-btn.compared {
+        background-color: #1c313a;
+        color: #90caf9;
+    }
+    
+    /* Card footer for displaying price and actions */
+    .card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        background-color: transparent;
+    }
+    
+    .card-img-top {
+        height: 200px;
+        object-fit: cover;
+    }
 </style>
 {% endblock %}
 
@@ -56,48 +125,48 @@
     <div class="container">
         <div class="row align-items-center">
             <div class="col-md-6 mb-4 mb-md-0">
-                <h1 class="display-4 fw-bold mb-3">Find Your Perfect Car</h1>
-                <p class="lead mb-4">The largest car marketplace in Kazakhstan with thousands of verified cars for sale.</p>
+                <h1 class="display-4 fw-bold mb-3">Найдите свой идеальный автомобиль</h1>
+                <p class="lead mb-4">Крупнейшая автомобильная площадка в Казахстане с тысячами проверенных автомобилей на продажу.</p>
                 <div class="d-flex gap-3">
-                    <a href="{% url 'car_list' %}" class="btn btn-primary btn-lg">Browse Cars</a>
+                    <a href="{% url 'car_list' %}" class="btn btn-primary btn-lg">Просмотр автомобилей</a>
                     {% if user.is_authenticated %}
-                        <a href="{% url 'car_create' %}" class="btn btn-outline-light btn-lg">Sell Your Car</a>
+                        <a href="{% url 'car_create' %}" class="btn btn-outline-light btn-lg">Продать автомобиль</a>
                     {% else %}
-                        <a href="{% url 'signup' %}" class="btn btn-outline-light btn-lg">Join Now</a>
+                        <a href="{% url 'signup' %}" class="btn btn-outline-light btn-lg">Регистрация</a>
                     {% endif %}
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="search-box">
-                    <h3 class="text-dark mb-3">Quick Search</h3>
+                    <h3 class="text-dark mb-3">Быстрый поиск</h3>
                     <form action="{% url 'car_list' %}" method="get">
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label for="brand" class="form-label text-dark">Brand</label>
+                                <label for="brand" class="form-label text-dark">Марка</label>
                                 <select id="brand" name="brand" class="form-select">
-                                    <option value="">All Brands</option>
+                                    <option value="">Все марки</option>
                                     {% for brand in brands %}
                                         <option value="{{ brand.id }}">{{ brand.name }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <label for="model" class="form-label text-dark">Model</label>
+                                <label for="model" class="form-label text-dark">Модель</label>
                                 <select id="model" name="model" class="form-select">
-                                    <option value="">All Models</option>
+                                    <option value="">Все модели</option>
                                     <!-- Will be populated dynamically -->
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <label for="price_from" class="form-label text-dark">Price From</label>
-                                <input type="number" id="price_from" name="price_from" class="form-control" placeholder="Min Price">
+                                <label for="price_from" class="form-label text-dark">Цена от</label>
+                                <input type="number" id="price_from" name="price_from" class="form-control" placeholder="Минимальная цена">
                             </div>
                             <div class="col-md-6">
-                                <label for="price_to" class="form-label text-dark">Price To</label>
-                                <input type="number" id="price_to" name="price_to" class="form-control" placeholder="Max Price">
+                                <label for="price_to" class="form-label text-dark">Цена до</label>
+                                <input type="number" id="price_to" name="price_to" class="form-control" placeholder="Максимальная цена">
                             </div>
                             <div class="col-12">
-                                <button type="submit" class="btn btn-primary w-100">Search</button>
+                                <button type="submit" class="btn btn-primary w-100">Поиск</button>
                             </div>
                         </div>
                     </form>
@@ -108,7 +177,7 @@
 </div>
 
 <div class="container mt-5">
-    <h2 class="text-center mb-4">Latest Car Listings</h2>
+    <h2 class="text-center mb-4">Последние объявления</h2>
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-5">
         {% for car in latest_cars %}
             <div class="col">
@@ -116,33 +185,39 @@
                     <a href="{{ car.get_absolute_url }}">
                         {% with main_image=car.images.filter.first %}
                             {% if main_image %}
-                                <img src="{{ main_image.image.url }}" class="card-img-top car-image" alt="{{ car }}">
+                                <img src="{{ main_image.image.url }}" class="card-img-top" alt="{{ car }}">
                             {% else %}
-                                <img src="{% static 'cars/images/placeholder.jpg' %}" class="card-img-top car-image" alt="No image available">
+                                <img src="{% static 'cars/images/placeholder.jpg' %}" class="card-img-top" alt="Нет изображения">
                             {% endif %}
                         {% endwith %}
                     </a>
                     
-                    <div class="card-body">
-                        <a href="{{ car.get_absolute_url }}" class="text-decoration-none text-dark">
+                    <div class="card-body pb-2">
+                        <a href="{{ car.get_absolute_url }}" class="text-decoration-none">
                             <h5 class="card-title">{{ car.brand }} {{ car.model }}</h5>
                         </a>
-                        <h6 class="card-subtitle mb-2 text-muted">{{ car.year }} • {{ car.mileage }} km</h6>
-                        
-                        <!-- Price and favorite button in one row -->
-                        <div class="price-container">
-                            <p class="card-text fw-bold text-primary mb-0">{{ car.price }} ₸</p>
-                            <div class="d-flex">
-                                {% if user.is_authenticated %}
-                                    <button class="favorite-btn me-2" data-car-id="{{ car.id }}">
-                                        <i class="{% if car in user.favorites.all|map_attr:'car' %}fas{% else %}far{% endif %} fa-heart"></i>
-                                    </button>
-                                {% endif %}
-                                <a href="{% url 'add_to_compare' car.id %}?next={{ request.path|urlencode }}" class="btn btn-sm btn-outline-secondary">
-                                    <i class="fas fa-balance-scale"></i> Сравнить
-                                </a>
-                            </div>
+                        <p class="card-subtitle mb-2 text-muted">{{ car.year }} • {{ car.mileage }} км</p>
+                    </div>
+                    
+                    <div class="card-footer border-top-0">
+                        <div>
+                            <h6 class="mb-0 text-primary fw-bold">{{ car.price }} ₸</h6>
                         </div>
+                        
+                        {% if user.is_authenticated and user.is_buyer and user != car.seller %}
+                        <div class="action-buttons">
+                            <button type="button" class="icon-btn {% if car in user.favorites.all|map_attr:'car' %}favorited{% endif %} favorite-btn" 
+                                    data-car-id="{{ car.id }}" title="{% if car in user.favorites.all|map_attr:'car' %}Удалить из избранного{% else %}Добавить в избранное{% endif %}">
+                                <i class="{% if car in user.favorites.all|map_attr:'car' %}fas{% else %}far{% endif %} fa-heart"></i>
+                            </button>
+                            
+                            <a href="{% url 'add_to_compare' car.id %}?next={{ request.path|urlencode }}" 
+                               class="icon-btn {% if car in compare_list %}compared{% endif %}" 
+                               title="Сравнить">
+                                <i class="fas fa-balance-scale"></i>
+                            </a>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -150,77 +225,82 @@
     </div>
     
     <div class="text-center mb-5">
-        <a href="{% url 'car_list' %}" class="btn btn-outline-primary">View All Cars</a>
+        <a href="{% url 'car_list' %}" class="btn btn-outline-primary">Показать все автомобили</a>
     </div>
     
     <div class="row justify-content-center mb-5">
         <div class="col-lg-8">
-            <h2 class="text-center mb-4">Why Choose Dongelek?</h2>
+            <h2 class="text-center mb-4">Почему Dongelek?</h2>
             <div class="row row-cols-1 row-cols-md-3 g-4">
                 <div class="col">
                     <div class="feature-card bg-light h-100">
                         <i class="fas fa-check-circle feature-icon"></i>
-                        <h4>Verified Sellers</h4>
-                        <p class="text-muted">All our sellers go through a verification process to ensure trust and safety.</p>
+                        <h4>Проверенные продавцы</h4>
+                        <p class="text-muted">Все наши продавцы проходят процесс проверки для обеспечения доверия и безопасности.</p>
                     </div>
                 </div>
                 <div class="col">
                     <div class="feature-card bg-light h-100">
                         <i class="fas fa-comments feature-icon"></i>
-                        <h4>Direct Communication</h4>
-                        <p class="text-muted">Chat directly with sellers without intermediaries for smooth transactions.</p>
+                        <h4>Прямое общение</h4>
+                        <p class="text-muted">Общайтесь напрямую с продавцами без посредников для гладких сделок.</p>
                     </div>
                 </div>
                 <div class="col">
                     <div class="feature-card bg-light h-100">
                         <i class="fas fa-robot feature-icon"></i>
-                        <h4>AI-Powered Recommendations</h4>
-                        <p class="text-muted">Get personalized car recommendations based on your preferences.</p>
+                        <h4>ИИ-рекомендации</h4>
+                        <p class="text-muted">Получайте персонализированные рекомендации автомобилей на основе ваших предпочтений.</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     
-    <h2 class="text-center mb-4">Popular Cars</h2>
+    <h2 class="text-center mb-4">Популярные автомобили</h2>
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-5">
         {% for car in popular_cars %}
             <div class="col">
                 <div class="card h-100">
-                    <span class="position-absolute top-0 start-0 badge bg-danger m-2">Popular</span>
+                    <span class="position-absolute top-0 start-0 badge bg-danger m-2">Популярный</span>
                     
                     <a href="{{ car.get_absolute_url }}">
                         {% with main_image=car.images.filter.first %}
                             {% if main_image %}
-                                <img src="{{ main_image.image.url }}" class="card-img-top car-image" alt="{{ car }}">
+                                <img src="{{ main_image.image.url }}" class="card-img-top" alt="{{ car }}">
                             {% else %}
-                                <img src="{% static 'cars/images/placeholder.jpg' %}" class="card-img-top car-image" alt="No image available">
+                                <img src="{% static 'cars/images/placeholder.jpg' %}" class="card-img-top" alt="Нет изображения">
                             {% endif %}
                         {% endwith %}
                     </a>
                     
-                    <div class="card-body">
-                        <a href="{{ car.get_absolute_url }}" class="text-decoration-none text-dark">
+                    <div class="card-body pb-2">
+                        <a href="{{ car.get_absolute_url }}" class="text-decoration-none">
                             <h5 class="card-title">{{ car.brand }} {{ car.model }}</h5>
                         </a>
-                        <h6 class="card-subtitle mb-2 text-muted">{{ car.year }} • {{ car.mileage }} km</h6>
-                        
-                        <!-- Price and favorite button in one row -->
-                        <div class="price-container">
-                            <p class="card-text fw-bold text-primary mb-0">{{ car.price }} ₸</p>
-                            <div class="d-flex">
-                                {% if user.is_authenticated %}
-                                    <button class="favorite-btn me-2" data-car-id="{{ car.id }}">
-                                        <i class="{% if car in user.favorites.all|map_attr:'car' %}fas{% else %}far{% endif %} fa-heart"></i>
-                                    </button>
-                                {% endif %}
-                                <a href="{% url 'add_to_compare' car.id %}?next={{ request.path|urlencode }}" class="btn btn-sm btn-outline-secondary">
-                                    <i class="fas fa-balance-scale"></i> Сравнить
-                                </a>
-                            </div>
+                        <p class="card-subtitle mb-2 text-muted">{{ car.year }} • {{ car.mileage }} км</p>
+                        <small class="text-muted">{{ car.views_count }} просмотров</small>
+                    </div>
+                    
+                    <div class="card-footer border-top-0">
+                        <div>
+                            <h6 class="mb-0 text-primary fw-bold">{{ car.price }} ₸</h6>
                         </div>
                         
-                        <small class="text-muted">{{ car.views_count }} views</small>
+                        {% if user.is_authenticated and user.is_buyer and user != car.seller %}
+                        <div class="action-buttons">
+                            <button type="button" class="icon-btn {% if car in user.favorites.all|map_attr:'car' %}favorited{% endif %} favorite-btn" 
+                                    data-car-id="{{ car.id }}" title="{% if car in user.favorites.all|map_attr:'car' %}Удалить из избранного{% else %}Добавить в избранное{% endif %}">
+                                <i class="{% if car in user.favorites.all|map_attr:'car' %}fas{% else %}far{% endif %} fa-heart"></i>
+                            </button>
+                            
+                            <a href="{% url 'add_to_compare' car.id %}?next={{ request.path|urlencode }}" 
+                               class="icon-btn {% if car in compare_list %}compared{% endif %}" 
+                               title="Сравнить">
+                                <i class="fas fa-balance-scale"></i>
+                            </a>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -242,18 +322,44 @@
                     success: function(data) {
                         const modelSelect = $('#model');
                         modelSelect.empty();
-                        modelSelect.append('<option value="">All Models</option>');
+                        modelSelect.append('<option value="">Все модели</option>');
                         data.models.forEach(function(model) {
                             modelSelect.append(`<option value="${model.id}">${model.name}</option>`);
                         });
                     }
                 });
             } else {
-                $('#model').empty().append('<option value="">All Models</option>');
+                $('#model').empty().append('<option value="">Все модели</option>');
             }
         });
         
-        // The favorite button handling is now managed by the global script in base.html
+        // Favorite button functionality
+        $('.favorite-btn').click(function() {
+            const carId = $(this).data('car-id');
+            const button = $(this);
+            
+            $.ajax({
+                url: '/cars/toggle-favorite/' + carId + '/',
+                type: 'POST',
+                data: {
+                    'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
+                },
+                success: function(response) {
+                    if (response.is_favorite) {
+                        button.addClass('favorited');
+                        button.find('i').removeClass('far').addClass('fas');
+                        button.attr('title', 'Удалить из избранного');
+                    } else {
+                        button.removeClass('favorited');
+                        button.find('i').removeClass('fas').addClass('far');
+                        button.attr('title', 'Добавить в избранное');
+                    }
+                },
+                error: function() {
+                    alert('При обновлении избранного произошла ошибка. Пожалуйста, попробуйте снова.');
+                }
+            });
+        });
     });
 </script>
 {% endblock %}
