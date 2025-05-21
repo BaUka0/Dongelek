@@ -473,7 +473,7 @@
                     {% if user.is_authenticated %}
                     {% if user.is_seller %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'car_create' %}"><i class="fas fa-tag"></i> Продать автомобиль</a>
+                            <a class="nav-link" href="{% url 'seller_dashboard' %}"><i class="fas fa-tag"></i> Панель продавца</a>
                         </li>
                     {% endif %}
                         {% if user.is_buyer %}

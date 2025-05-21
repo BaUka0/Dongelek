@@ -131,7 +131,7 @@
                     <a href="{% url 'car_list' %}" class="btn btn-primary btn-lg">Просмотр автомобилей</a>
                     {% if user.is_authenticated %}
                         {% if user.is_seller %}
-                            <a href="{% url 'car_create' %}" class="btn btn-outline-light btn-lg">Продать автомобиль</a>
+                            <a href="{% url 'seller_dashboard' %}" class="btn btn-outline-light btn-lg">Панель продавца</a>
                         {% else %}
                             <a href="{% url 'become_seller' %}" class="btn btn-outline-light btn-lg">Стать продавцом</a>
                         {% endif %}
