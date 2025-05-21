@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Статус заявки - Dongelek{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header {% if seller_request.status == 'approved' %}bg-success{% elif seller_request.status == 'rejected' %}bg-danger{% else %}bg-primary{% endif %} text-white">
+                    <h4 class="mb-0">
+                        Статус заявки: {{ seller_request.get_status_display }}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5>Детали заявки</h5>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <strong>Дата подачи:</strong> {{ seller_request.created_at|date:"d.m.Y H:i" }}
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Последнее обновление:</strong> {{ seller_request.updated_at|date:"d.m.Y H:i" }}
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Причина:</strong> {{ seller_request.reason }}
+                            </li>
+                            {% if seller_request.business_description %}
+                            <li class="list-group-item">
+                                <strong>Описание бизнеса:</strong> {{ seller_request.business_description }}
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    
+                    {% if seller_request.status == 'pending' %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-hourglass-half me-2"></i>
+                            Ваша заявка находится на рассмотрении. Мы свяжемся с вами, как только заявка будет обработана.
+                        </div>
+                    {% elif seller_request.status == 'approved' %}
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i>
+                            Поздравляем! Ваша заявка одобрена. Теперь вы можете размещать объявления о продаже автомобилей.
+                            <a href="{% url 'car_create' %}" class="btn btn-success btn-sm mt-2">Разместить объявление</a>
+                        </div>
+                    {% elif seller_request.status == 'rejected' %}
+                        <div class="alert alert-danger">
+                            <i class="fas fa-times-circle me-2"></i>
+                            К сожалению, ваша заявка была отклонена. Для получения дополнительной информации, свяжитесь с администрацией.
+                        </div>
+                    {% endif %}
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'home' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-home me-2"></i>Вернуться на главную
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
