@@ -1,1 +1,0 @@
-i use static1 instead of static for collectstatic

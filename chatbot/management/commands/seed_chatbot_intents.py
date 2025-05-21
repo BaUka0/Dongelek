@@ -2,106 +2,106 @@ from django.core.management.base import BaseCommand
 from chatbot.models import ChatbotIntent
 
 class Command(BaseCommand):
-    help = 'Seeds initial chatbot intents and responses'
+    help = 'Заполняет начальные намерения и ответы чат-бота'
     
     def handle(self, *args, **options):
-        # Define initial intents
+        # Определите начальные намерения
         intents_data = [
             {
                 'name': 'car_search',
-                'description': 'Help with searching for cars',
-                'pattern': 'how to search for cars, find cars, search cars, looking for car, find a car',
-                'response': 'You can search for cars by using our search filters on the main page. You can filter by brand, model, year, price, and more!'
+                'description': 'Помощь в поиске автомобилей',
+                'pattern': 'как искать автомобили, найти автомобиль, поиск авто, ищу машину, найти машину',
+                'response': 'Вы можете искать автомобили, используя наши фильтры поиска на главной странице. Вы можете фильтровать по марке, модели, году, цене и другим параметрам!'
             },
             {
                 'name': 'sell_car',
-                'description': 'Information about selling a car',
-                'pattern': 'how to sell my car, sell a car, selling car, list car, car listing',
-                'response': 'To sell your car, you need to create an account and click on "Sell Your Car" button. You\'ll need to provide details and photos of your car.'
+                'description': 'Информация о продаже автомобиля',
+                'pattern': 'как продать машину, продать автомобиль, продажа авто, разместить объявление, размещение авто',
+                'response': 'Чтобы продать автомобиль, вам нужно создать аккаунт и нажать кнопку "Продать автомобиль". Вам потребуется указать детали и загрузить фотографии автомобиля.'
             },
             {
                 'name': 'account_creation',
-                'description': 'Help with account creation',
-                'pattern': 'create account, sign up, register, join, new account',
-                'response': 'To create an account, click on the "Register" link in the top menu and fill out the registration form with your details.'
+                'description': 'Помощь с созданием аккаунта',
+                'pattern': 'создать аккаунт, регистрация, зарегистрироваться, новый аккаунт, создать учетную запись',
+                'response': 'Чтобы создать аккаунт, нажмите на ссылку "Регистрация" в верхнем меню и заполните форму регистрации своими данными.'
             },
             {
                 'name': 'login_help',
-                'description': 'Help with logging in',
-                'pattern': 'how to login, sign in, cannot login, login problem, forgot password',
-                'response': 'To login, click on the "Login" link in the top menu. If you forgot your password, use the "Forgot Password" link on the login page.'
+                'description': 'Помощь со входом в аккаунт',
+                'pattern': 'как войти, вход, не могу войти, проблемы с входом, забыл пароль',
+                'response': 'Чтобы войти, нажмите на ссылку "Вход" в верхнем меню. Если вы забыли пароль, используйте ссылку "Забыли пароль" на странице входа.'
             },
             {
                 'name': 'contact_seller',
-                'description': 'Help with contacting sellers',
-                'pattern': 'contact seller, message seller, talk to seller, ask seller',
-                'response': 'You can contact a seller by clicking on the "Contact Seller" button on the car detail page. You\'ll need to be logged in to send messages.'
+                'description': 'Помощь с контактом продавцов',
+                'pattern': 'связаться с продавцом, написать продавцу, поговорить с продавцом, задать вопрос продавцу',
+                'response': 'Вы можете связаться с продавцом, нажав кнопку "Связаться с продавцом" на странице автомобиля. Для отправки сообщений необходимо войти в аккаунт.'
             },
             {
                 'name': 'compare_cars',
-                'description': 'Help with comparing cars',
-                'pattern': 'compare cars, car comparison, how to compare',
-                'response': 'You can add cars to your comparison list by clicking the "Compare" button on any car listing. Then view your comparison list by clicking on "Compare" in the top menu.'
+                'description': 'Помощь с сравнением автомобилей',
+                'pattern': 'сравнить автомобили, сравнение авто, как сравнить',
+                'response': 'Вы можете добавить автомобили в список для сравнения, нажав кнопку "Сравнить" на любом объявлении. Затем откройте список сравнения, нажав "Сравнить" в верхнем меню.'
             },
             {
                 'name': 'pricing',
-                'description': 'Information about car pricing',
-                'pattern': 'car prices, pricing, how much, price range, average price',
-                'response': 'Car prices on our platform vary based on brand, model, year, condition, and features. You can use our filters to find cars within your budget.'
+                'description': 'Информация о ценах на автомобили',
+                'pattern': 'цены на авто, стоимость, сколько стоит, диапазон цен, средняя цена',
+                'response': 'Цены на автомобили на нашей платформе зависят от марки, модели, года выпуска, состояния и характеристик. Вы можете использовать фильтры, чтобы найти автомобили в вашем бюджете.'
             },
             {
                 'name': 'favorites',
-                'description': 'Help with favorites feature',
-                'pattern': 'favorites, save car, bookmark, favorite cars',
-                'response': 'You can save cars to your favorites by clicking the heart icon on any car listing. View your favorites by clicking on "Favorites" in the top menu.'
+                'description': 'Помощь с функцией избранного',
+                'pattern': 'избранное, сохранить авто, закладки, избранные автомобили',
+                'response': 'Вы можете добавить автомобили в избранное, нажав на значок сердца в любом объявлении. Просмотреть избранное можно, нажав "Избранное" в верхнем меню.'
             },
             {
                 'name': 'about_site',
-                'description': 'Information about the website',
-                'pattern': 'about dongelek, about website, what is dongelek, company info',
-                'response': 'Dongelek is the largest car marketplace in Kazakhstan, connecting car buyers and sellers. We offer a secure platform with verified listings and user reviews.'
+                'description': 'Информация о сайте',
+                'pattern': 'о dongelek, о сайте, что такое dongelek, информация о компании',
+                'response': 'Dongelek — крупнейшая автомобильная площадка в Казахстане, соединяющая покупателей и продавцов автомобилей. Мы предлагаем безопасную платформу с проверенными объявлениями и отзывами пользователей.'
             },
             {
                 'name': 'car_maintenance',
-                'description': 'Information about car maintenance',
-                'pattern': 'car maintenance, service car, maintain car, car service, oil change',
-                'response': 'Regular car maintenance is important for keeping your vehicle in good condition. We recommend following the manufacturer\'s service schedule, usually in your car\'s manual. For used cars, it\'s good to check service history before purchase.'
+                'description': 'Информация о техническом обслуживании автомобилей',
+                'pattern': 'техническое обслуживание, сервис авто, обслуживание машины, замена масла',
+                'response': 'Регулярное техническое обслуживание важно для поддержания автомобиля в хорошем состоянии. Мы рекомендуем следовать графику обслуживания, указанному в руководстве вашего автомобиля. Для подержанных авто полезно проверить историю обслуживания перед покупкой.'
             },
             {
                 'name': 'fuel_efficiency',
-                'description': 'Information about fuel efficiency',
-                'pattern': 'fuel efficiency, gas mileage, fuel consumption, save fuel, economic car',
-                'response': 'Fuel efficiency varies by car model and engine type. On Dongelek, you can filter cars by fuel type including efficient options like hybrids and electric vehicles. You can also check specific fuel consumption details on car listings.'
+                'description': 'Информация об экономии топлива',
+                'pattern': 'экономия топлива, расход топлива, экономичный автомобиль, гибрид, электромобиль',
+                'response': 'Экономия топлива зависит от модели автомобиля и типа двигателя. На Dongelek вы можете фильтровать автомобили по типу топлива, включая гибриды и электромобили. Также вы можете проверить расход топлива в описании автомобиля.'
             },
             {
                 'name': 'car_insurance',
-                'description': 'Information about car insurance',
-                'pattern': 'car insurance, insurance, insure car, vehicle insurance',
-                'response': 'In Kazakhstan, car insurance is mandatory. The basic required insurance is OSAGO (Compulsory Motor Third Party Liability Insurance). When buying a car, you should arrange insurance before driving it. Some sellers might offer to transfer their existing policy.'
+                'description': 'Информация о страховании автомобилей',
+                'pattern': 'страхование авто, страховка, застраховать машину, автострахование',
+                'response': 'В Казахстане страхование автомобиля обязательно. Основной вид страхования — ОСАГО (Обязательное страхование гражданской ответственности владельцев транспортных средств). При покупке автомобиля оформите страховку до начала эксплуатации. Некоторые продавцы могут предложить передать действующую страховку.'
             },
             {
                 'name': 'ev_cars',
-                'description': 'Information about electric vehicles',
-                'pattern': 'electric car, ev, electric vehicle, tesla, charging',
-                'response': 'Dongelek lists electric vehicles from brands like Tesla, Nissan, and others. When buying an EV in Kazakhstan, consider the charging infrastructure in your area. You can filter for electric cars specifically on our search page.'
+                'description': 'Информация об электромобилях',
+                'pattern': 'электромобиль, ev, электрокар, tesla, зарядка',
+                'response': 'На Dongelek представлены электромобили от таких брендов, как Tesla, Nissan и других. При покупке электромобиля в Казахстане учитывайте инфраструктуру зарядных станций в вашем регионе. Вы можете отфильтровать электромобили на странице поиска.'
             },
             {
                 'name': 'car_financing',
-                'description': 'Information about car financing options',
-                'pattern': 'car loan, finance car, auto loan, payment plan, car financing, buy car installments',
-                'response': 'Many cars on Dongelek can be purchased with financing. You can arrange a car loan through most Kazakhstan banks, and some sellers offer in-house financing options. Check with your bank for current auto loan rates and eligibility.'
+                'description': 'Информация о финансировании автомобилей',
+                'pattern': 'автокредит, финансирование авто, рассрочка, кредит на авто, купить авто в рассрочку',
+                'response': 'Многие автомобили на Dongelek можно приобрести в кредит. Вы можете оформить автокредит в большинстве банков Казахстана, а некоторые продавцы предлагают внутренние варианты финансирования. Уточните текущие ставки и условия в вашем банке.'
             },
             {
                 'name': 'safety_ratings',
-                'description': 'Information about car safety',
-                'pattern': 'car safety, safety rating, safe car, safest cars, crash test',
-                'response': 'Car safety is an important consideration. While Dongelek doesnt display formal safety ratings, you can research specific models on international safety rating websites like Euro NCAP. Newer cars typically have more advanced safety features.'
+                'description': 'Информация о безопасности автомобилей',
+                'pattern': 'безопасность авто, рейтинг безопасности, безопасный автомобиль, краш-тест',
+                'response': 'Безопасность автомобиля — важный фактор. Хотя Dongelek не отображает официальные рейтинги безопасности, вы можете найти информацию о моделях на международных сайтах, таких как Euro NCAP. Новые автомобили обычно оснащены более современными системами безопасности.'
             },
             {
                 'name': 'popular_brands',
-                'description': 'Information about popular car brands',
-                'pattern': 'popular brands, best brands, car brands, reliable brands',
-                'response': 'Popular car brands in Kazakhstan include Toyota, Hyundai, Kia, Volkswagen, and Lexus. These brands are known for reliability and good service networks. You can browse all available brands using our search filters.'
+                'description': 'Информация о популярных брендах автомобилей',
+                'pattern': 'популярные бренды, лучшие бренды, марки авто, надежные бренды',
+                'response': 'Популярные бренды автомобилей в Казахстане включают Toyota, Hyundai, Kia, Volkswagen и Lexus. Эти бренды известны своей надежностью и хорошей сетью обслуживания. Вы можете просмотреть все доступные бренды, используя наши фильтры поиска.'
             }
         ]
         
@@ -123,4 +123,4 @@ class Command(BaseCommand):
             else:
                 updated_count += 1
         
-        self.stdout.write(self.style.SUCCESS(f'Successfully created {created_count} new intents and updated {updated_count} existing intents.'))
+        self.stdout.write(self.style.SUCCESS(f'Успешно создано {created_count} новых намерений и обновлено {updated_count} существующих намерений.'))

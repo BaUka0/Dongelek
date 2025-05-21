@@ -25,10 +25,10 @@ USE_ADVANCED_AI = getattr(settings, 'USE_ADVANCED_AI', False)
 def get_default_responses():
     """Get default responses for common scenarios"""
     return {
-        'greeting': "Hello! I'm Dongelek AI Assistant. How can I help you with finding your perfect car today?",
-        'fallback': "I'm sorry, I didn't understand that. Could you rephrase or ask about car listings, car features, or how to sell your car?",
-        'thanks': "You're welcome! Is there anything else I can help you with?",
-        'goodbye': "Thank you for chatting! Feel free to return if you have more questions about cars.",
+        'greeting': "Здравствуйте! Я — Dongelek AI Assistant. Чем могу помочь вам в поиске идеального автомобиля сегодня?",
+        'fallback': "Извините, я не понял ваш запрос. Пожалуйста, переформулируйте вопрос или спросите о списках автомобилей, их характеристиках или о продаже авто.",
+        'thanks': "Пожалуйста! Могу ли я ещё чем-то помочь?",
+        'goodbye': "Спасибо за общение! Возвращайтесь, если появятся вопросы по автомобилям.",
     }
 
 def get_chat_history(session, max_history=CHATBOT_HISTORY_LENGTH):

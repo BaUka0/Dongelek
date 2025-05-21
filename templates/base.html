@@ -822,8 +822,8 @@
                     
                     // Show mode change message
                     const modeMessage = useAdvancedAI 
-                        ? "Advanced AI mode enabled. I'm now using my most intelligent brain to answer your questions."
-                        : "Basic mode enabled. I'm now using a simpler system to answer common questions.";
+                        ? "Продвинутый режим ИИ включен. Теперь я использую свой самый интеллектуальный мозг для ответа на ваши вопросы."
+                        : "Базовый режим включен. Теперь я использую более простую систему для ответа на общие вопросы.";
                     
                     appendMessage(modeMessage, false);
                     
@@ -874,7 +874,7 @@
                             removeTypingIndicator();
                             
                             // Add error message
-                            appendMessage("Sorry, I'm having trouble connecting. Please try again later.", false);
+                            appendMessage("Извините, у меня проблемы с подключением. Пожалуйста, попробуйте позже.", false);
                         }
                     });
                 });

@@ -14,10 +14,11 @@ from django.contrib.auth.views import LoginView, PasswordResetView, PasswordRese
 from django.db.models import Avg
 
 from Dongelek import settings
-from .forms import SignUpForm, CustomAuthenticationForm, ProfileUpdateForm
+from .forms import SignUpForm, CustomAuthenticationForm, ProfileUpdateForm, SellerRequestForm
 from .tokens import account_activation_token
 from cars.models import SellerReview
 from cars.forms import SellerReviewForm
+from .models import SellerRequest
 
 User = get_user_model()
 
@@ -134,3 +135,42 @@ def profile_detail(request, username):
     }
     
     return render(request, 'accounts/profile_detail.html', context)
+
+
+@login_required
+def become_seller(request):
+    # Check if user already has a pending request
+    existing_request = SellerRequest.objects.filter(user=request.user, status='pending').first()
+    if existing_request:
+        messages.info(request, 'У вас уже есть заявка на рассмотрении.')
+        return redirect('seller_request_status', request_id=existing_request.id)
+    
+    # Check if user is already a seller
+    if request.user.is_seller:
+        messages.info(request, 'Вы уже являетесь продавцом.')
+        return redirect('dashboard')
+    
+    if request.method == 'POST':
+        form = SellerRequestForm(request.POST)
+        if form.is_valid():
+            seller_request = form.save(commit=False)
+            seller_request.user = request.user
+            seller_request.save()
+            messages.success(request, 'Ваша заявка отправлена и будет рассмотрена администратором.')
+            return redirect('seller_request_status', request_id=seller_request.id)
+    else:
+        form = SellerRequestForm()
+    
+    return render(request, 'accounts/become_seller.html', {'form': form})
+
+
+@login_required
+def seller_request_status(request, request_id):
+    # Get the seller request
+    try:
+        seller_request = SellerRequest.objects.get(id=request_id, user=request.user)
+    except SellerRequest.DoesNotExist:
+        messages.error(request, 'Заявка не найдена.')
+        return redirect('home')
+    
+    return render(request, 'accounts/seller_request_status.html', {'seller_request': seller_request})

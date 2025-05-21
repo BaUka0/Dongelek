@@ -1,15 +1,18 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse, NoReverseMatch
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import (
-    ListView, DetailView, CreateView, UpdateView, DeleteView, FormView
+    ListView, DetailView, CreateView, UpdateView, DeleteView, FormView, TemplateView
 )
 from django.http import JsonResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from django.db.models import Q, Avg
+from django.db.models import Q, Avg, Count, Sum, F
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django.core.paginator import Paginator
+import datetime
+import json
 from .models import (
     Car, CarImage, Favorite, Brand, CarModel, City, Region,
     CompareList, CompareItem, SellerReview
@@ -586,3 +589,162 @@ def delete_seller_review(request, review_id):
         'next': request.GET.get('next', '')
     }
     return render(request, 'cars/seller_review_confirm_delete.html', context)
+
+
+class SellerDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+    template_name = 'cars/seller_dashboard.html'
+    
+    def test_func(self):
+        return self.request.user.is_seller
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        
+        # Get user's cars with prefetched data
+        user_cars = Car.objects.filter(seller=user).prefetch_related('images', 'favorited_by')
+        
+        # Pagination for cars
+        paginator = Paginator(user_cars.order_by('-created_at'), 10)
+        page_number = self.request.GET.get('page', 1)
+        cars_page = paginator.get_page(page_number)
+        
+        # Statistics
+        active_cars_count = user_cars.filter(is_active=True).count()
+        inactive_cars_count = user_cars.filter(is_active=False).count()
+        total_views = user_cars.aggregate(Sum('views_count'))['views_count__sum'] or 0
+        total_favorites = Favorite.objects.filter(car__seller=user).count()
+        
+        # User reviews
+        reviews = SellerReview.objects.filter(seller=user).select_related('reviewer', 'car').order_by('-created_at')
+        reviews_paginator = Paginator(reviews, 5)
+        reviews_page = self.request.GET.get('reviews_page', 1)
+        reviews_page_obj = reviews_paginator.get_page(reviews_page)
+        
+        # Review statistics
+        avg_rating = reviews.aggregate(Avg('rating'))['rating__avg']
+        review_count = reviews.count()
+        
+        # Chart data for views
+        today = datetime.date.today()
+        last_week = today - datetime.timedelta(days=7)
+        
+        # Generate dates for the last 7 days
+        dates = [(last_week + datetime.timedelta(days=i)).strftime('%d.%m') for i in range(8)]
+        
+        # Get view counts for each day
+        views_data = []
+        for i in range(8):
+            day = last_week + datetime.timedelta(days=i)
+            # In a real app, you would track daily views in a separate model
+            # This is a placeholder that just divides the total by days
+            day_views = total_views // 8
+            # Add some randomness for demo purposes
+            import random
+            day_views = max(0, day_views + random.randint(-5, 5))
+            views_data.append(day_views)
+        
+        # Recent activities
+        # In a real app, you would have an ActivityLog model to track all activities
+        # This is a placeholder with some sample activities
+        recent_activities = []
+        
+        # Add some sample activities based on favorites if they exist
+        favorites = Favorite.objects.filter(car__seller=user).order_by('-created_at')[:3]
+        for favorite in favorites:
+            recent_activities.append({
+                'type': 'favorite',
+                'message': f'Пользователь добавил "{favorite.car.brand} {favorite.car.model}" в избранное',
+                'timestamp': favorite.created_at
+            })
+        
+        # Add some sample activities based on views
+        for car in user_cars.order_by('-updated_at')[:2]:
+            if car.views_count > 0:
+                recent_activities.append({
+                    'type': 'view',
+                    'message': f'Объявление "{car.brand} {car.model}" просмотрено {car.views_count} раз(а)',
+                    'timestamp': car.updated_at
+                })
+        
+        # Add some sample activities based on reviews if they exist
+        for review in reviews[:2]:
+            recent_activities.append({
+                'type': 'review',
+                'message': f'Получен новый отзыв с рейтингом {review.rating}/5',
+                'timestamp': review.created_at
+            })
+        
+        # Sort activities by timestamp
+        recent_activities.sort(key=lambda x: x['timestamp'], reverse=True)
+        
+        # Limit to 5 most recent activities
+        recent_activities = recent_activities[:5]
+        
+        context.update({
+            'cars': cars_page,
+            'active_cars_count': active_cars_count,
+            'inactive_cars_count': inactive_cars_count,
+            'total_views': total_views,
+            'total_favorites': total_favorites,
+            'reviews': reviews_page_obj,
+            'reviews_page_obj': reviews_page_obj,
+            'avg_rating': avg_rating,
+            'review_count': review_count,
+            'chart_dates': json.dumps(dates),
+            'chart_views': json.dumps(views_data),
+            'recent_activities': recent_activities
+        })
+        
+        return context
+
+@login_required
+def toggle_car_status(request, slug):
+    car = get_object_or_404(Car, slug=slug, seller=request.user)
+    
+    if request.method == 'POST':
+        # Toggle the is_active status
+        car.is_active = not car.is_active
+        car.save()
+        
+        status = "активировано" if car.is_active else "деактивировано"
+        messages.success(request, f"Объявление {car.brand} {car.model} успешно {status}.")
+    
+    return redirect('seller_dashboard')
+
+@login_required
+def dashboard_chart_data(request):
+    if not request.user.is_seller:
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+    
+    timeframe = request.GET.get('timeframe', 'week')
+    
+    today = datetime.date.today()
+    
+    if timeframe == 'week':
+        start_date = today - datetime.timedelta(days=7)
+        date_format = '%d.%m'
+    else:  # month
+        start_date = today - datetime.timedelta(days=30)
+        date_format = '%d.%m'
+    
+    # Generate dates for the time period
+    dates = []
+    views = []
+    
+    days_diff = (today - start_date).days + 1
+    
+    for i in range(days_diff):
+        day = start_date + datetime.timedelta(days=i)
+        dates.append(day.strftime(date_format))
+        
+        # In a real app, you would get actual daily views from a view tracking model
+        # For demo purposes, we're generating random data
+        import random
+        day_views = random.randint(5, 50)
+        views.append(day_views)
+    
+    return JsonResponse({
+        'dates': dates,
+        'views': views
+    })

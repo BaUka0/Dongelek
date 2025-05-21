@@ -3,6 +3,8 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
+from accounts.models import SellerRequest
+
 User = get_user_model()
 
 
@@ -51,3 +53,13 @@ class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ('username', 'email', 'avatar', 'about')
+
+
+class SellerRequestForm(forms.ModelForm):
+    class Meta:
+        model = SellerRequest
+        fields = ['reason', 'business_description']
+        widgets = {
+            'reason': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Укажите причину, почему вы хотите стать продавцом'}),
+            'business_description': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Опишите ваш бизнес или опыт продажи автомобилей'})
+        }

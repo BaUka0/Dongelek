@@ -160,10 +160,14 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 INTELLIGENCE_API_URL = "https://api.intelligence.io.solutions/api/v1/chat/completions"
 INTELLIGENCE_MODEL_NAME = "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8"
 IOINTELLIGENCE_API_KEY = "io-v2-eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJvd25lciI6IjZjMmEyZmQ3LTNmZDEtNGEwMS1iZmQxLWYyNWVkNWQwODVkZSIsImV4cCI6NDg5OTQwODA2MH0.KPnm4GlJtE_vzJgrVvMOTSo_RnQpsHyXdtjKYdumJ8x7C8AB1q7traBBOrZ7GWIb_hZV9QIeyIeV759b6S3TQg" 
-CHATBOT_SYSTEM_PROMPT = "You are Dongelek Assistant, an AI helper for a car marketplace in Kazakhstan. Provide helpful, concise answers about car buying, selling, and features on the Dongelek platform. Be friendly and informative."
+CHATBOT_SYSTEM_PROMPT = "Вы — Dongelek Assistant, AI-помощник для автомобильного маркетплейса в Казахстане. Давайте полезные, краткие ответы по вопросам покупки, продажи автомобилей и функциям платформы Dongelek. Будьте дружелюбны и информативны."
 CHATBOT_HISTORY_LENGTH = 10
 CHATBOT_MAX_TOKENS = 1024
 USE_ADVANCED_AI = False  # Set to True to enable advanced AI by default
+
+# Crispy Forms settings
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

@@ -130,7 +130,11 @@
                 <div class="d-flex gap-3">
                     <a href="{% url 'car_list' %}" class="btn btn-primary btn-lg">Просмотр автомобилей</a>
                     {% if user.is_authenticated %}
-                        <a href="{% url 'car_create' %}" class="btn btn-outline-light btn-lg">Продать автомобиль</a>
+                        {% if user.is_seller %}
+                            <a href="{% url 'car_create' %}" class="btn btn-outline-light btn-lg">Продать автомобиль</a>
+                        {% else %}
+                            <a href="{% url 'become_seller' %}" class="btn btn-outline-light btn-lg">Стать продавцом</a>
+                        {% endif %}
                     {% else %}
                         <a href="{% url 'signup' %}" class="btn btn-outline-light btn-lg">Регистрация</a>
                     {% endif %}

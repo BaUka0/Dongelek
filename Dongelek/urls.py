@@ -19,11 +19,14 @@ from django.urls import path, include
 from django.conf.urls.static import static
 
 from Dongelek import settings, views
+from accounts import views as accounts_views
 
 urlpatterns = [
     path('', views.home, name='home'),
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
+    path('accounts/become-seller/', accounts_views.become_seller, name='become_seller'),
+    path('accounts/seller-request/<int:request_id>/', accounts_views.seller_request_status, name='seller_request_status'),
     path('cars/', include('cars.urls')),
     path('chat/', include('chat.urls')),
     path('chatbot/', include('chatbot.urls')),

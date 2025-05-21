@@ -5,6 +5,12 @@ urlpatterns = [
     path('', views.CarListView.as_view(), name='car_list'),
     path('create/', views.CarCreateView.as_view(), name='car_create'),
     path('compare/', views.compare_list, name='compare_list'),
+    # Dashboard routes
+    path('dashboard/', views.SellerDashboardView.as_view(), name='seller_dashboard'),
+    path('dashboard/chart-data/', views.dashboard_chart_data, name='dashboard_chart_data'),
+    path('toggle-status/<slug:slug>/', views.toggle_car_status, name='toggle_car_status'),
+
+    
     path('<slug:slug>/', views.CarDetailView.as_view(), name='car_detail'),
     path('<slug:slug>/update/', views.CarUpdateView.as_view(), name='car_update'),
     path('<slug:slug>/delete/', views.CarDeleteView.as_view(), name='car_delete'),
@@ -26,4 +32,6 @@ urlpatterns = [
     # Seller Reviews
     path('seller/<int:seller_id>/review/', views.add_seller_review, name='add_seller_review'),
     path('seller/review/<int:review_id>/delete/', views.delete_seller_review, name='delete_seller_review'),
+
+    
 ]
