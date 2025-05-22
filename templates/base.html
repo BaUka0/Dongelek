@@ -919,8 +919,16 @@
 <script>
     // Connection for real-time notifications
     function connectNotificationSocket() {
+        // For Beget hosting, we need to use a different WebSocket URL format
+        // that works with their proxy setup
         const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const notifySocket = new WebSocket(`${wsProtocol}//${window.location.host}/ws/notifications/`);
+        const host = window.location.host;
+        
+        // Use the hostname without port for Beget compatibility
+        const wsUrl = `${wsProtocol}//${host}/ws/notifications/`;
+        
+        console.log("Attempting to connect to WebSocket at:", wsUrl);
+        const notifySocket = new WebSocket(wsUrl);
         
         let reconnectAttempts = 0;
         const maxReconnectAttempts = 5;
